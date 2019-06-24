@@ -1,4 +1,8 @@
 # Simple REST
+![](https://img.shields.io/badge/Code%20Style-Standard-yellow.svg)
+![](https://img.shields.io/badge/Dependencies-Express-green.svg)
+![](https://img.shields.io/badge/License-Beerware-yellowgreen.svg)
+
 
 ## Prerequiste
 - Node.js - Download and Install [Node.js](https://nodejs.org/en/) with [NVM](https://github.com/creationix/nvm) (Node Version Manager) - Simple bash script to manage multiple active node.js versions.
