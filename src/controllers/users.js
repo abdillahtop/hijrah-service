@@ -6,23 +6,31 @@ module.exports = {
     return res.json({ message: 'Hello' })
   },
 
+  // Using Callback
   getUsers: (req, res) => {
     userModels.getUsers((err, result) => {
       if (err) console.log(err)
 
-      res.json(result)
-      // return MiscHelper.response(res, result, 200)
+      // res.json(result)
+      MiscHelper.response(res, result, 200)
     })
   },
 
+  // Using Promise
   userDetail: (req, res) => {
     const userid = req.params.userid
 
-    userModels.userDetail(userid, (err, resultUser) => {
-      if (err) console.log(err)
-      const result = resultUser[0]
-      
-      return MiscHelper.response(res, result, 200)
-    })
+    userModels.userDetail(userid)
+      .then((resultUser) => {
+        const result = resultUser[0]
+        MiscHelper.response(res, result, 200)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  },
+
+  updateUser: async (req, res) => {
+
   }
 }

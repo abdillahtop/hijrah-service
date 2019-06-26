@@ -1,6 +1,6 @@
-const exp = {}
+module.exports = {
 
-exp.response = (res, result, status, error) => {
+  response: (res, result, status, error) => {
     let resultPrint = {}
 
     resultPrint.error = error || null
@@ -8,6 +8,5 @@ exp.response = (res, result, status, error) => {
     resultPrint.result = result
 
     return res.status(resultPrint.status_code).json(resultPrint)
+  }
 }
-
-module.exports = exp

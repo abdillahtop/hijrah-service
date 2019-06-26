@@ -5,7 +5,7 @@ const bodyParser = require('body-parser') // Import body-parses
 const app = express() // Create method
 const port = process.env.SERVER_PORT || 5000 // Default PORT
 
-const UserRouter = require('./src/routes/users')
+const userRoute = require('./src/routes/users')
 
 app.listen(port, () => {
   console.log(`\n App listening on port ${port} \n`)
@@ -14,6 +14,4 @@ app.listen(port, () => {
 app.use(bodyParser.json()) // Body parse json
 app.use(bodyParser.urlencoded({ extended: false })) // body type
 
-app.use('/users', UserRouter)
-
-module.exports = app
+app.use('/users', userRoute)
