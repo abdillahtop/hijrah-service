@@ -18,17 +18,21 @@ $ npm install
 
 ### Create Environment Variable
 ```
-$ touch .env
+$ cp .env.example .env
 $ nano .env
 ```
 
 ```
-DB_HOST="Your_Host"
-DB_USER="Your_Username"
-DB_PASSWORD="Your_Password"
-DB_NAME="Your_Table"
+SERVER_PORT = YOUR-PORT
+WHITELIST = "YOUR-WHITELIST"
 
-SERVER_PORT=9999
+DB_HOST = "YOU-DB-HOST"
+DB_USER = "YOUR-DB-USER"
+DB_PASSWORD = "YOUR-DB-PASSWORD"
+DB_NAME = "YOUR-DB-NAME"
+
+SECRET_KEY = "YOUR-SECRET-KEY"
+REQUEST_HEADERS = "YOUR-APP-HEADERS"
 ```
 ### Start Development Server
 ```
