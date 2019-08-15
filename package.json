@@ -4,7 +4,7 @@
   "description": "API for Library Books",
   "main": "app.js",
   "scripts": {
-    "test": "mocha --opts ./test/mocha.opts",
+    "test": "mocha",
     "start": "nodemon app.js"
   },
   "author": "Tatas Fachrul",
