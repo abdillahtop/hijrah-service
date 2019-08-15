@@ -9,14 +9,15 @@ module.exports = {
     const headerSecret = req.headers['x-access-token']
 
     if (headerAuth !== allowedAccess) {
-      return MiscHelper.response(res, null, 401, 'Unauthorized, Need access token!')
-    } else if (typeof headerSecret === 'undefined') { 
+      return MiscHelper.response(res, null, 401, 'Unauthorized, Need Authentication!')
+    } else if (typeof headerSecret === 'undefined') {
+      console.log('Authentication Valid!')
       next()
     } else {
       const bearerToken = headerSecret.split(' ')
       const token = bearerToken[1]
       req.token = token
-      console.log('Token stored!' + token)
+      console.log('Token stored!')
       next()
     }
   },
@@ -32,7 +33,7 @@ module.exports = {
       if (err && err.name === 'JsonWebTokenError') return MiscHelper.response(res, null, 401, 'Invalid Token')
 
       if (parseInt(userToken) !== parseInt(decoded.userid)) return MiscHelper.response(res, null, 401, 'Invalid User Token')
-      console.log(decoded)
+      console.log('Access Granted!')
       next()
     })
   }

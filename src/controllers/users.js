@@ -2,6 +2,7 @@ const userModels = require('../models/users')
 const MiscHelper = require('../helpers/helpers')
 
 const jwt = require('jsonwebtoken')
+const cloudinary = require('cloudinary').v2
 
 module.exports = {
   getIndex: (req, res) => {
@@ -72,6 +73,7 @@ module.exports = {
 
           delete dataUser.salt
           delete dataUser.password
+          // delete dataUser.token
 
           return MiscHelper.response(res, dataUser, 200)
         } else {
@@ -81,5 +83,20 @@ module.exports = {
       .catch((error) => {
         console.log(error)
       })
+  },
+
+  cloudinary: async (req, res) => {
+    const file = await req.file
+    console.log(file)
+
+    cloudinary.config({
+      cloud_name: 'milkovich',
+      api_key: '498688251622387',
+      api_secret: 'uOa4edAZOjGvDCCBkpXrT-3bLk8'
+    })
+
+    cloudinary.uploader.upload(req.file, (err, result) => {
+      console.log(result, err)
+    })
   }
 }
