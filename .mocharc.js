@@ -6,6 +6,5 @@ module.exports = {
   package: './package.json',
   extension: ['js'],
   reporter: 'spec',
-  checkLeaks: true,
   exit: true
 }

@@ -1,7 +1,6 @@
-const assert = require('assert')
 const App = require('../app')
 const should = require('should')
-const expect = require('chai').expect
+// const expect = require('chai').expect
 const supertest = require('supertest')
 
 const server = supertest(App.server)
@@ -17,10 +16,6 @@ const user = {
   email: 'user@user.com',
   password: 'useruser'
 }
-
-before((done) => {
-  done()
-})
 
 describe('User Authentication', () => {
 
@@ -55,23 +50,4 @@ describe('User can get data', () => {
         done()
       })
   })
-})
-
-describe('Get detail', () => {
-  it('Get profile', (done) => {
-    server
-      .get(`/user/10`)
-      .expect('Content-Type', /json/)
-      .set('Authorization', 'X-CONTROL-APP')
-      .expect(200)
-      .end((err, res) => {
-        res.status.should.equal(200)
-        done()
-      })
-  })
-})
-
-after((done) => {
-  App.server.close()
-  done()
 })
