@@ -3,7 +3,7 @@ const crypto = require('crypto')
 module.exports = {
 
   response: (res, result, status, error) => {
-    let resultPrint = {}
+    const resultPrint = {}
 
     resultPrint.error = error || null
     resultPrint.status_code = status || 200
