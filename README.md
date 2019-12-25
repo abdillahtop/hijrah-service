@@ -11,8 +11,8 @@
 ## Installation
 ### Clone
 ```
-$ git clone https://github.com/tatasfachrul/simple-REST
-$ cd simple-REST
+$ git clone https://github.com/abdillahtop/hijrah-service
+$ cd hijrah-service
 $ npm install
 ```
 
@@ -24,7 +24,6 @@ $ nano .env
 
 ```
 SERVER_PORT = YOUR-PORT
-WHITELIST = "YOUR-WHITELIST"
 
 DB_HOST = "YOU-DB-HOST"
 DB_USER = "YOUR-DB-USER"
@@ -32,14 +31,8 @@ DB_PASSWORD = "YOUR-DB-PASSWORD"
 DB_NAME = "YOUR-DB-NAME"
 
 SECRET_KEY = "YOUR-SECRET-KEY"
-REQUEST_HEADERS = "YOUR-APP-HEADERS"
 ```
 ### Start Development Server
 ```
 $ npm start
 ```
-
-### License
-----
-
-[Beerware](https://en.wikipedia.org/wiki/Beerware "Beerware") © [Tatas](https://github.com/tatasfachrul "Tatas")
