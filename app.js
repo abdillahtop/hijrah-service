@@ -12,6 +12,9 @@ const server = require('http').createServer(app)
 const port = process.env.SERVER_PORT || 5000 // Default PORT
 
 const userRoute = require('./src/routes/users')
+const OrganizedRoute = require('./src/routes/organized')
+const kajianRoute = require('./src/routes/kajian')
+const ustadzRoute = require('./src/routes/ustadz')
 const whitelist = process.env.WHITELIST
 
 const corsOptions = (req, callback) => {
@@ -33,18 +36,17 @@ const corsOptions = (req, callback) => {
 app.use(xssFilter())
 app.use(logger('dev'))
 
-// app.listen(port, () => {
-//   console.log(`\n App listening on port ${port} \n`)
-// }) // Create listening app
-
 app.listen(port, () => {
   console.log(`\n App listening on port ${port} \n`)
-}) // Create listening app
+}) 
 
-app.use(bodyParser.json()) // Body parse json
-app.use(bodyParser.urlencoded({ extended: false })) // body type
+app.use(bodyParser.json()) 
+app.use(bodyParser.urlencoded({ extended: true })) 
 
-app.use('/user', userRoute)
+app.use('/api/v1/user', userRoute)
+app.use('/api/v1/organized', OrganizedRoute)
+app.use('/api/v1/kajian', kajianRoute)
+app.use('/api/v1/ustadz', ustadzRoute)
 
 process.on('uncaughtException', (err) => {
   console.error(new Date() + ' uncaughtException: ', err.message)

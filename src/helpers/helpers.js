@@ -12,6 +12,18 @@ module.exports = {
     return res.status(resultPrint.status_code).json(resultPrint)
   },
 
+  resPagination: (res, result, status, totalData, totalPage, error) => {
+    let resultPrint = {}
+
+    resultPrint.error = error || null
+    resultPrint.status_code = status
+    resultPrint.totalData = totalData
+    resultPrint.totalPage = totalPage
+    resultPrint.result = result
+
+    return res.status(resultPrint.status_code).json(resultPrint)
+  },
+
   generateSalt: (length) => {
     return crypto.randomBytes(Math.ceil(length / 2)).toString('hex').slice(0, length)
   },
