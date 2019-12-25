@@ -47,7 +47,7 @@ module.exports = {
 
   updateToken: (token, email) => {
     return new Promise((resolve, reject) => {
-      connection.query('UPDATE users SET token= ? WHERE email = ?', [token, email], (err, result) => {
+      connection.query('UPDATE users SET token = ? WHERE email = ?', [token, email], (err, result) => {
         if (!err) {
           resolve(result)
         } else {

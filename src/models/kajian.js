@@ -13,54 +13,6 @@ module.exports = {
         })
     },
 
-    checkCategory: (categoryId) => {
-        return new Promise((resolve, reject) => {
-            connection.query('SELECT category_id as id, name FROM category_kajian WHERE category_id = ?', categoryId, (err, result) => {
-                if (!err) {
-                    resolve(result)
-                } else {
-                    reject(new Error(err))
-                }
-            })
-        })
-    },
-
-    checkCategoryName: (categoryName) => {
-        return new Promise((resolve, reject) => {
-            connection.query('SELECT category_id as id, name FROM category_kajian WHERE name = ?', categoryName, (err, result) => {
-                if (!err) {
-                    resolve(result)
-                } else {
-                    reject(new Error(err))
-                }
-            })
-        })
-    },
-
-    checkRegencies: (regenciesId) => {
-        return new Promise((resolve, reject) => {
-            connection.query('SELECT * FROM regencies WHERE id = ?', regenciesId, (err, result) => {
-                if (!err) {
-                    resolve(result)
-                } else {
-                    reject(new Error(err))
-                }
-            })
-        })
-    },
-
-    checkKajian: (kajianId) => {
-        return new Promise((resolve, reject) => {
-            connection.query('SELECT * FROM kajian WHERE kajian_id = ?', kajianId, async (err, result) => {
-                if (!err) {
-                    await resolve(result)
-                } else {
-                    await reject(new Error(err))
-                }
-            })
-        })
-    },
-
     getKajianAll: (dateNow, limit, page) => {
         let offset = (limit * page) - limit
         return new Promise((resolve, reject) => {
@@ -70,7 +22,7 @@ module.exports = {
                         if (!err2) {
                             let totalData = result2[0].total
                             let totalPage = Math.ceil(totalData / limit)
-                            await connection.query('SELECT * FROM kajian ORDER BY title asc LIMIT ? OFFSET ?', [limit, offset], (err3, results) => {
+                            await connection.query('SELECT * FROM kajian ORDER BY startDate desc LIMIT ? OFFSET ?', [limit, offset], (err3, results) => {
                                 if (!err3) {
                                     resolve([results, totalData, totalPage])
                                 } else {
@@ -97,7 +49,7 @@ module.exports = {
                         if (!err2) {
                             let totalData = result2[0].total
                             let totalPage = Math.ceil(totalData / limit)
-                            await connection.query('SELECT * FROM kajian WHERE categoryName = ? ORDER BY title asc LIMIT ? OFFSET ?', [categoryName, limit, offset], (err3, results) => {
+                            await connection.query('SELECT * FROM kajian WHERE categoryName = ? ORDER BY startDate desc LIMIT ? OFFSET ?', [categoryName, limit, offset], (err3, results) => {
                                 if (!err3) {
                                     resolve([results, totalData, totalPage])
                                 } else {
@@ -171,5 +123,43 @@ module.exports = {
                 }
             })
         })
+    },
+
+    checkKajian: (kajianId) => {
+        return new Promise((resolve, reject) => {
+            connection.query('SELECT * FROM kajian WHERE kajian_id = ?', kajianId, async (err, result) => {
+                if (!err) {
+                    await resolve(result)
+                } else {
+                    await reject(new Error(err))
+                }
+            })
+        })
+    },
+
+    checkMemberKajian: (kajianId, userId) => {
+        return new Promise((resolve, reject) => {
+            connection.query('SELECT * FROM member_kajian WHERE kajian_id = ? AND user_id = ?', [kajianId, userId], async (err, result) => {
+                if (!err) {
+                    await resolve(result)
+                } else {
+                    await reject(new Error(err))
+                    console.log("ini errornya "+err)
+                }
+            })
+        })
+    },
+
+    getKajianByUser: (userId, active) => {
+        return new Promise((resolve, reject) => {
+            connection.query('SELECT kajian.title, kajian.categoryName, kajian.startDate, kajian.location FROM kajian JOIN member_kajian ON kajian.kajian_id = member_kajian.kajian_id WHERE member_kajian.user_id = ? AND kajian.active = ?', [userId, active], async (err, result) => {
+                if(!err){
+                    await resolve(result)
+                } else {
+                    await reject(new Error(err))
+                }
+            })
+        })
     }
+
 }
