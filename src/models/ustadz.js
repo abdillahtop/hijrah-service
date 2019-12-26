@@ -23,5 +23,17 @@ module.exports = {
                 }
             })
         })
+    },
+
+    getUstadzByKajian: (kajianId) => {
+        return new Promise((resolve, reject) => {
+            connection.query('SELECT ustadz.ustadz_name, ustadz.image FROM ustadz JOIN kajian ON ustadz.kajian_id = kajian.kajian_id WHERE kajian.kajian_id = ?', kajianId, (err, result) => {
+                if(!err){
+                    resolve(result)
+                } else {
+                    reject(new Error(err))
+                }
+            })
+        })
     }
 }

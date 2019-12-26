@@ -57,9 +57,9 @@ module.exports = {
     })
   },
 
-  activationUser: (email, token) => {
+  activationUser: (email) => {
     return new Promise((resolve, reject) => {
-      connection.query('UPDATE users SET activation = 1 WHERE email = ? AND token= ?',[email, token], (err, result) => {
+      connection.query('UPDATE users SET activation = 1 WHERE email = ?',email, (err, result) => {
         if(!err){
           resolve(result)
         } else {

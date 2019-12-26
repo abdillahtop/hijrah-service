@@ -12,8 +12,8 @@ module.exports = {
     },
 
     addKajian: async (req, res, next) => {
-        const checkOrganized = await organizedModels.getOrganizedById(req.body.organizedId)
-        const checkCategory = await categoryModels.checkCategory(req.body.categoryId)
+        let checkOrganized = await organizedModels.getOrganizedById(req.body.organizedId)
+        let checkCategory = await categoryModels.checkCategory(req.body.categoryId)
 
         if (checkCategory[0] == undefined) {
             MiscHelper.response(res, 'Category not found', 404)
@@ -93,9 +93,9 @@ module.exports = {
     },
 
     addMemberKajian: async (req, res) => {
-        const checkKajian = await kajianModels.checkKajian(req.body.kajianId)
-        const checkUser = await userModels.userDetail(req.body.userId)
-        const checkMember = await kajianModels.checkMemberKajian(req.body.kajianId,  req.body.userId)
+        let checkKajian = await kajianModels.checkKajian(req.body.kajianId)
+        let checkUser = await userModels.userDetail(req.body.userId)
+        let checkMember = await kajianModels.checkMemberKajian(req.body.kajianId,  req.body.userId)
         if (checkKajian[0] == undefined) {
             MiscHelper.response(res, 'Kajian not found', 404)
             next()
@@ -173,5 +173,19 @@ module.exports = {
                 MiscHelper.response(res, 'Bad Request', 404)
                 console.log('errornya ' + error)
             })
+    },
+
+    unjoinKajian: async (req, res) => {
+        let userId = await req.query.userId
+        let kajianId = await req.query.kajianId
+
+        kajianModels.unjoinKajian(userId, kajianId)
+        .then(() => {
+            MiscHelper.response(res, 'Success Unjoin Event', 200)
+        })
+        .catch((error) => {
+            MiscHelper.response(res, 'Bad request', 404)
+            console.log("error "+ error)
+        })
     }
 }

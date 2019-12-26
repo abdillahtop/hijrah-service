@@ -160,6 +160,18 @@ module.exports = {
                 }
             })
         })
+    },
+
+    unjoinKajian: (userId, kajianId) => {
+        return new Promise((resolve, reject) => {
+            connection.query('DELETE FROM member_kajian WHERE user_id = ? AND kajian_id = ?',[userId, kajianId], async (err, result) => {
+                if(!err){
+                    await resolve(result)
+                } else {
+                    await reject(new Error(err))
+                }
+            })
+        })
     }
 
 }

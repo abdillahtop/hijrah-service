@@ -14,6 +14,7 @@ Route
     .get('/kajian-cat', KajianController.getAllKajianByCategory)
     .get('/kajian-user', Auth.accesstoken, KajianController.getKajianbyUser)
     .get('/find-kajian', Auth.accesstoken, KajianController.findKajian)
+    .get('/unjoin-kajian', Auth.accesstoken, KajianController.unjoinKajian)
     .post('/add-kajian', Auth.accesstoken, KajianController.addKajian)
     .post('/add-member-kajian', Auth.accesstoken, KajianController.addMemberKajian)
 

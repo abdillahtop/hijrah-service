@@ -1,6 +1,9 @@
 const userModels = require('../models/users');
 const MiscHelper = require('../helpers/helpers');
+const nodemailer = require('nodemailer');
+const axios = require('axios');
 const uuidv4 = require('uuid/v4');
+const domain = require('../configs/global_config/config')
 const dateFormat = require('dateformat');
 const jwt = require('jsonwebtoken');
 const cloudinary = require('cloudinary').v2
@@ -34,7 +37,7 @@ module.exports = {
 
   register: async (req, res) => {
     const checkEmail = await userModels.getByEmail(req.body.email)
-    console.log("testing " + checkEmail[0])
+    console.log("hello "+checkEmail[0])
     if (checkEmail[0] == undefined) {
       const salt = MiscHelper.generateSalt(64)
       const passwordHash = MiscHelper.setPassword(req.body.password, salt)
@@ -55,8 +58,32 @@ module.exports = {
       }
 
       userModels.register(data)
-        .then((resultRegister) => {
-          MiscHelper.response(res, 'Data has been saved', 200)
+        .then(async (resultRegister) => {
+          await MiscHelper.response(res, 'Data has been saved', 200)
+          let transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: 'roronoazum@gmail.com',
+              pass: 'sewelas11'
+            }
+          });
+          let body =await `${domain.baseUrl}/api/v1/user/activation?email=${req.body.email}`
+          console.log("hello "+body)
+          const mailOptions = {
+            from: 'roronoazum@gmail.com', // sender address
+            to: req.body.email, // list of receivers
+            subject: 'Verify Akun', // Subject line
+            html: "Hello, "+req.body.name+"<br> Please Click on the link to verify your email.<br><a href=" + body + ">Click here to verify</a>"
+          };
+          transporter.sendMail(mailOptions, function (err, info) {
+            if (err) {
+              console.log(err)
+            }
+            else {
+              res.json('Sukses')
+              console.log('suskses')
+            }
+          });
         })
         .catch((error) => {
           console.log(error)
@@ -95,24 +122,23 @@ module.exports = {
   },
 
   activationUser: (req, res) => {
-    const email = req.body.email
-    const token = req.body.token
+    const email = req.query.email
     userModels.getByEmail(email)
       .then((result) => {
         if (validate.isEmpty(email)) {
           MiscHelper.response(res, 'need token!', 403)
         } else {
           const dataUser = result[0]
-          if(dataUser.activation == '1') {
+          if (dataUser.activation == '1') {
             MiscHelper.response(res, 'User already actived', 202)
-          } else if (token === dataUser.token){
-            userModels.activationUser(email, token)
-            .then(() => {
-              MiscHelper.response(res, 'User has been actived', 200)
-            })
-            .catch(() => {
-              MiscHelper.response(res, 'Bad Request', 404)
-            })
+          } else {
+            userModels.activationUser(email)
+              .then(() => {
+                MiscHelper.response(res, 'User has been actived', 200)
+              })
+              .catch(() => {
+                MiscHelper.response(res, 'Bad Request', 404)
+              })
           }
         }
       })

@@ -45,6 +45,18 @@ module.exports = {
           MiscHelper.response(res, 'Bad request!', 404)
           console.log('Err '+error)
       })
+  },
+
+  getUstadzByKajian: (req, res) => {
+      let kajianId = req.query.kajianId
+      ustadzModels.getUstadzByKajian(kajianId)
+      .then((result) => {
+          if(result == ''){
+              MiscHelper.response(res, 'Not found ustadz in this kajian', 404)
+          } else {
+              MiscHelper.response(res, result, 200)
+          }
+      })
   }
   
 }

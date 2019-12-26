@@ -10,9 +10,8 @@ const Auth = require('../helpers/auth')
 Route
   .get('/', UserController.getIndex)
   .get('/:userid', UserController.userDetail)
-  .post('/register', UserController.register)
+  .get('/activation', UserController.activationUser)
+  .post('/register', UserController.register, sending)
   .post('/login', UserController.login)
   .post('/cloudinary', upload.single('image'), UserController.cloudinary)
-  .post('/activation', UserController.activationUser)
-  .post('/sendemail', sending)
 module.exports = Route
