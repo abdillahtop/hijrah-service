@@ -4,7 +4,7 @@
   "description": "API for Library Books",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "node app.js"
   },
   "author": "Hijrah",
   "license": "Beerware",
