@@ -41,7 +41,6 @@ module.exports = {
       MiscHelper.response(res, 'Category not found', 404)
       next()
     }
-    console.log('tess ' + JSON.stringify(checkOrganized[0]))
     if (checkOrganized[0] === undefined) {
       MiscHelper.response(res, 'Organized not found', 404)
     } else if (checkOrganized[0].activation === '0') {
@@ -249,7 +248,6 @@ module.exports = {
 
   deleteKajian: async (req, res) => {
     const checkKajian = await kajianModels.checkKajianbyUserId(req.user_id)
-    console.log('hello ' + checkKajian[0])
     if (checkKajian[0] === undefined) {
       MiscHelper.response(res, 'Kajian not found', 404)
     } else {
