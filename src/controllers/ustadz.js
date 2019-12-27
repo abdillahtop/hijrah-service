@@ -1,62 +1,76 @@
-const ustadzModels = require('../models/ustadz');
-const kajianModels = require('../models/kajian');
-const MiscHelper = require('../helpers/helpers');
-const uuidv4 = require('uuid/v4');
-const dateFormat = require('dateformat');
-const jwt = require('jsonwebtoken');
-const cloudinary = require('cloudinary').v2
-const validate = require('validate.js')
+const ustadzModels = require('../models/ustadz')
+const kajianModels = require('../models/kajian')
+const MiscHelper = require('../helpers/helpers')
+const uuidv4 = require('uuid/v4')
+const cloudinary = require('cloudinary')
 
 module.exports = {
   getIndex: (req, res) => {
-    return res.json({ code: 200, message: 'Server Running well, ready to use' })
+    return res.json({
+      code: 200,
+      message: 'Server Running well, ready to use'
+    })
   },
 
   addUstadz: async (req, res) => {
+    const path = await req.file.path
+    const geturl = async (req) => {
+      cloudinary.config({
+        cloud_name: process.env.CLOUD_NAME,
+        api_key: process.env.API_CLOUD_KEY,
+        api_secret: process.env.API_CLOUD_SECRET
+      })
+
+      let dataCloudinary
+      await cloudinary.uploader.upload(path, (result) => {
+        dataCloudinary = result.url
+      })
+
+      return dataCloudinary
+    }
     const checkKajian = await kajianModels.checkKajian(req.body.kajianId)
-    console.log("cekk "+ JSON.stringify(checkKajian))
-    if(checkKajian[0] == undefined) {
-        MiscHelper.response(res, 'Kajian not found', 404)
+    if (checkKajian[0] === undefined) {
+      MiscHelper.response(res, 'Kajian not found', 404)
     } else {
-        const data = {
-            kajian_id: checkKajian[0].kajian_id,
-            ustadz_id: uuidv4(),
-            ustadz_name: req.body.nameUstadz,
-            image: validate.isEmpty(req.body.image) ? 'default' : req.body.image
-        }
-        ustadzModels.addUstadz(data)
-            .then(() => {
-                MiscHelper.response(res, 'Add ustadz success!', 200)
-            })
-            .catch((error) => {
-                MiscHelper.response(res, 'Bad request', 404)
-                console.log("error "+ error)
-            })
+      const data = {
+        kajian_id: checkKajian[0].kajian_id,
+        ustadz_id: uuidv4(),
+        ustadz_name: req.body.nameUstadz,
+        image: await geturl()
+      }
+      ustadzModels
+        .addUstadz(data)
+        .then(() => {
+          MiscHelper.response(res, 'Add ustadz success!', 200)
+        })
+        .catch(error => {
+          MiscHelper.response(res, 'Bad request', 404)
+          console.log('error ' + error)
+        })
     }
   },
 
   deleteUstadz: (req, res) => {
-      const ustadzId = req.params.ustadzId
-      ustadzModels.deleteUstadz(ustadzId)
+    const ustadzId = req.params.ustadzId
+    ustadzModels
+      .deleteUstadz(ustadzId)
       .then(() => {
-          MiscHelper.response(res, 'Ustadz has been delete', 200)
+        MiscHelper.response(res, 'Ustadz has been delete', 200)
       })
-      .catch((error) => {
-          MiscHelper.response(res, 'Bad request!', 404)
-          console.log('Err '+error)
+      .catch(error => {
+        MiscHelper.response(res, 'Bad request!', 404)
+        console.log('Err ' + error)
       })
   },
 
   getUstadzByKajian: (req, res) => {
-      let kajianId = req.query.kajianId
-      ustadzModels.getUstadzByKajian(kajianId)
-      .then((result) => {
-          if(result == ''){
-              MiscHelper.response(res, 'Not found ustadz in this kajian', 404)
-          } else {
-              MiscHelper.response(res, result, 200)
-          }
-      })
+    const kajianId = req.query.kajianId
+    ustadzModels.getUstadzByKajian(kajianId).then(result => {
+      if (result === '') {
+        MiscHelper.response(res, 'Not found ustadz in this kajian', 404)
+      } else {
+        MiscHelper.response(res, result, 200)
+      }
+    })
   }
-  
 }

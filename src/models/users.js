@@ -2,7 +2,7 @@ const connection = require('../configs/database/mysql/db')
 
 module.exports = {
   getUsers: (callback) => {
-    connection.query(`SELECT * FROM users`, (err, result) => {
+    connection.query('SELECT * FROM users', (err, result) => {
       if (err) console.log(err)
 
       callback(err, result)
@@ -59,8 +59,20 @@ module.exports = {
 
   activationUser: (email) => {
     return new Promise((resolve, reject) => {
-      connection.query('UPDATE users SET activation = 1 WHERE email = ?',email, (err, result) => {
-        if(!err){
+      connection.query('UPDATE users SET activation = 1 WHERE email = ?', email, (err, result) => {
+        if (!err) {
+          resolve(result)
+        } else {
+          reject(new Error(err))
+        }
+      })
+    })
+  },
+
+  updateProfile: (data, userId) => {
+    return new Promise((resolve, reject) => {
+      connection.query('UPDATE users SET ? WHERE user_id = ?', [data, userId], (err, result) => {
+        if (!err) {
           resolve(result)
         } else {
           reject(new Error(err))

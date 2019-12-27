@@ -12,12 +12,13 @@ module.exports = {
     return res.status(resultPrint.status_code).json(resultPrint)
   },
 
-  resPagination: (res, result, status, totalData, totalPage, error) => {
-    let resultPrint = {}
+  resPagination: (res, result, status, totalData, page, totalPage, error) => {
+    const resultPrint = {}
 
     resultPrint.error = error || null
     resultPrint.status_code = status
     resultPrint.totalData = totalData
+    resultPrint.page = page
     resultPrint.totalPage = totalPage
     resultPrint.result = result
 
@@ -29,9 +30,9 @@ module.exports = {
   },
 
   setPassword: (password, salt) => {
-    let hash = crypto.createHmac('sha512', salt)
+    const hash = crypto.createHmac('sha512', salt)
     hash.update(password)
-    let value = hash.digest('hex')
+    const value = hash.digest('hex')
     return {
       salt: salt,
       passwordHash: value

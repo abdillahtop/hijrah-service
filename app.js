@@ -8,8 +8,7 @@ const logger = require('morgan')
 const http = require('http')
 
 const app = express() // Create method
-const server = require('http').createServer(app)
-const port = process.env.PORT || 5000 // Default PORT
+const port = process.env.SERVER_PORT || 5000 // Default PORT
 
 const userRoute = require('./src/routes/users')
 const OrganizedRoute = require('./src/routes/organized')
@@ -31,17 +30,17 @@ const corsOptions = (req, callback) => {
   }
 }
 
-// app.use(Cors())
-// app.options('*', Cors(corsOptions))
+app.use(Cors())
+app.options('*', Cors(corsOptions))
 app.use(xssFilter())
 app.use(logger('dev'))
 
 app.listen(port, () => {
   console.log(`\n App listening on port ${port} \n`)
-}) 
+})
 
-app.use(bodyParser.json()) 
-app.use(bodyParser.urlencoded({ extended: true })) 
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use('/api/v1/user', userRoute)
 app.use('/api/v1/organized', OrganizedRoute)

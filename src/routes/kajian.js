@@ -1,21 +1,29 @@
 const express = require('express')
 const Route = express.Router()
 const multer = require('multer')
-const upload = multer()
-const sending = require('../helpers/nodemailer')
-
 const KajianController = require('../controllers/kajian')
 const Auth = require('../helpers/auth')
 
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname)
+  }
+})
+const upload = multer({ storage: storage })
+
 Route
-    .get('/', KajianController.getIndex)
-    .get('/member-kajian', Auth.accesstoken, KajianController.getMemberKajianAll)
-    .get('/kajian-all', KajianController.getAllKajian)
-    .get('/kajian-cat', KajianController.getAllKajianByCategory)
-    .get('/kajian-user', Auth.accesstoken, KajianController.getKajianbyUser)
-    .get('/find-kajian', Auth.accesstoken, KajianController.findKajian)
-    .get('/unjoin-kajian', Auth.accesstoken, KajianController.unjoinKajian)
-    .post('/add-kajian', Auth.accesstoken, KajianController.addKajian)
-    .post('/add-member-kajian', Auth.accesstoken, KajianController.addMemberKajian)
+  .get('/', KajianController.getIndex)
+  .get('/member-kajian', Auth.accesstoken, KajianController.getMemberKajianAll)
+  .get('/kajian-all', KajianController.getAllKajian)
+  .get('/kajian-cat', KajianController.getAllKajianByCategory)
+  .get('/kajian-user', Auth.accesstoken, KajianController.getKajianbyUser)
+  .get('/find-kajian', Auth.accesstoken, KajianController.findKajian)
+  .post('/add-kajian', upload.single('image'), Auth.accesstoken, KajianController.addKajian)
+  .post('/add-member-kajian', Auth.accesstoken, KajianController.addMemberKajian)
+  .delete('/unjoin-kajian', Auth.accesstoken, KajianController.unjoinKajian)
+  .delete('/', Auth.accesstoken, KajianController.deleteKajian)
 
 module.exports = Route
