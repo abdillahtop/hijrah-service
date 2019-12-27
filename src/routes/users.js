@@ -21,6 +21,5 @@ Route
   .post('/activation', UserController.activationUser)
   .post('/register', UserController.register, sending)
   .post('/login', UserController.login)
-  // .post('/cloudinary', upload.single('image'), UserController.cloudinary)
   .patch('/update-profile', upload.single('image'), Auth.accesstoken, UserController.updateProfile)
 module.exports = Route
