@@ -67,7 +67,7 @@ module.exports = {
         latitude: parseFloat(req.body.latitude),
         longitude: parseFloat(req.body.longitude),
         locationMap: req.body.locationMap,
-        publishAt: dateFormat(new Date().toLocaleString(), 'isoDateTime'),
+        publishAt: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
         active: true,
         image: await geturl()
       }
@@ -86,7 +86,7 @@ module.exports = {
   getAllKajian: async (req, res) => {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
-    const dateNow = await dateFormat(new Date().toLocaleString(), 'isoDateTime')
+    const dateNow = await dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss')
     kajianModels
       .getKajianAll(dateNow, limit, page)
       .then(result => {
@@ -111,7 +111,7 @@ module.exports = {
     )
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
-    const dateNow = await dateFormat(new Date().toLocaleString(), 'isoDateTime')
+    const dateNow = await dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss')
 
     if (checkCategory[0] === undefined) {
       MiscHelper.response(res, 'Category not found', 404)
@@ -159,7 +159,7 @@ module.exports = {
         registration_id: uuidv4(),
         user_id: req.user_id,
         kajian_id: req.body.kajianId,
-        register_at: dateFormat(new Date().toLocaleString(), 'isoDateTime')
+        register_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss')
       }
       kajianModels
         .addMemberKajian(data)
