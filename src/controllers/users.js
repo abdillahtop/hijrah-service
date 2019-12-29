@@ -30,9 +30,14 @@ module.exports = {
       .userDetail(req.user_id)
       .then(resultUser => {
         const result = resultUser[0]
-        MiscHelper.response(res, result, 200)
+        if (resultUser[0] === undefined) {
+          MiscHelper.response(res, 'user not found', 404)
+        } else {
+          MiscHelper.response(res, result, 200)
+        }
       })
       .catch(error => {
+        MiscHelper.response(res, 'Bad request', 404)
         console.log(error)
       })
   },
