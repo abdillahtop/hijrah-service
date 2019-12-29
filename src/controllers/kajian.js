@@ -26,7 +26,11 @@ module.exports = {
 
       let dataCloudinary
       await cloudinary.uploader.upload(path, (result) => {
-        dataCloudinary = result.url
+        if (result.error) {
+          MiscHelper.response(res, 'Cloud Server disable', 404)
+        } else {
+          dataCloudinary = result.url
+        }
       })
 
       return dataCloudinary

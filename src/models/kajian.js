@@ -3,11 +3,11 @@ const connection = require('../configs/database/mysql/db')
 module.exports = {
   addKajian: (data) => {
     return new Promise((resolve, reject) => {
-      connection.query('INSERT INTO kajian SET ?', data, (err, result) => {
+      connection.query('INSERT INTO kajian SET ?', data, async (err, result) => {
         if (!err) {
-          resolve(result)
+          await resolve(result)
         } else {
-          reject(new Error(err))
+          await reject(new Error(err))
         }
       })
     })
