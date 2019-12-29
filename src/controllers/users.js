@@ -7,6 +7,7 @@ const dateFormat = require('dateformat')
 const cloudinary = require('cloudinary')
 const jwt = require('jsonwebtoken')
 const validate = require('validate.js')
+const config = require('../configs/global_config/config')
 
 module.exports = {
   getIndex: (req, res) => {
@@ -48,7 +49,7 @@ module.exports = {
         name: req.body.name,
         password: passwordHash.passwordHash,
         salt: passwordHash.salt,
-        profile_url: 'default',
+        profile_url: config.defaultProfile,
         activation: 0,
         created_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
         updated_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
