@@ -52,6 +52,21 @@ module.exports = {
     }
   },
 
+  organizedDetail: async (req, res) => {
+    organizedModels.getOrganizer(req.user_id)
+      .then((result) => {
+        if (result[0] === undefined) {
+          MiscHelper.response(res, 'User not found', 404)
+        } else {
+          MiscHelper.response(res, result[0], 200)
+        }
+      })
+      .catch((err) => {
+        MiscHelper.response(res, 'Bad request', 404)
+        console.log(err)
+      })
+  },
+
   activeOrganized: async (req, res) => {
     const checkOrganized = await organizedModels.checkOrganized(req.query.organizedId)
 
