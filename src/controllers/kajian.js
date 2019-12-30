@@ -110,11 +110,11 @@ module.exports = {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
     const dateNow = await dateFormat(new Date(), 'yyyy-mm-dd')
-    const latitude = await req.body.latitude
-    const longitude = await req.body.longitude
-
+    const latitude = await req.query.latitude
+    const longitude = await req.query.longitude
+    console.log('query ' + JSON.stringify(req.query))
     kajianModels
-      .getKajianAll(dateNow, latitude, longitude, limit, page)
+      .getKajianAllNearby(dateNow, latitude, longitude, limit, page)
       .then(result => {
         MiscHelper.resPagination(
           res,
