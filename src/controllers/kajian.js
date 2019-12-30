@@ -110,8 +110,8 @@ module.exports = {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
     const dateNow = await dateFormat(new Date(), 'yyyy-mm-dd')
-    const latitude = await req.query.latitude
-    const longitude = await req.query.longitude
+    const latitude = await req.body.latitude
+    const longitude = await req.body.longitude
 
     kajianModels
       .getKajianAll(dateNow, latitude, longitude, limit, page)
