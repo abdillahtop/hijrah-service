@@ -58,8 +58,8 @@ module.exports = {
         location: req.body.location,
         startDate: req.body.startDate,
         endDate: req.body.endDate,
-        startDateFormat: dateFormat(req.body.startDate, 'yyyy-mm-dd'),
-        endDateFormat: dateFormat(req.body.endDate, 'yyyy-mm-dd'),
+        timeStart: req.body.timeStart,
+        timeEnd: req.body.timeEnd,
         description: req.body.description,
         title: req.body.title,
         linkVideo: req.body.linkVideo,
@@ -86,7 +86,7 @@ module.exports = {
   getAllKajian: async (req, res) => {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
-    const dateNow = await dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss')
+    const dateNow = await dateFormat(new Date(), 'yyyy-mm-dd')
     kajianModels
       .getKajianAll(dateNow, limit, page)
       .then(result => {
@@ -111,7 +111,7 @@ module.exports = {
     )
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
-    const dateNow = await dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss')
+    const dateNow = await dateFormat(new Date(), 'yyyy-mm-dd')
 
     if (checkCategory[0] === undefined) {
       MiscHelper.response(res, 'Category not found', 404)
