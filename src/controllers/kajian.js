@@ -71,6 +71,7 @@ module.exports = {
         active: true,
         image: await geturl()
       }
+
       kajianModels
         .addKajian(data)
         .then(() => {
