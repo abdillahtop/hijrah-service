@@ -40,6 +40,33 @@ module.exports = {
     })
   },
 
+  getKajianAllNearby: (dateNow, latitude, longitude, limit, page) => {
+    const offset = (limit * page) - limit
+    return new Promise((resolve, reject) => {
+      connection.query('UPDATE kajian SET active = ? WHERE endDate <= ?', [0, dateNow], async (err1, result1) => {
+        if (!err1) {
+          await connection.query('SELECT count(*) as total from kajian', async (err2, result2) => {
+            if (!err2) {
+              const totalData = result2[0].total
+              const totalPage = Math.ceil(totalData / limit)
+              await connection.query(`SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ${latitude} ) ) * cos( radians( ${longitude}) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians(${latitude})) ) ) AS distance FROM kajian HAVING distance < 50 ORDER BY distance LIMIT ? OFFSET ?`, [limit, offset], (err3, results) => {
+                if (!err3) {
+                  resolve([results, totalData, offset + 1, totalPage])
+                } else {
+                  reject(new Error(err3))
+                }
+              })
+            } else {
+              reject(new Error(err2))
+            }
+          })
+        } else {
+          reject(new Error(err1))
+        }
+      })
+    })
+  },
+
   getKajianAllbyCategory: (dateNow, categoryName, limit, page) => {
     const offset = (limit * page) - limit
     return new Promise((resolve, reject) => {

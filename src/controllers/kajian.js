@@ -106,6 +106,31 @@ module.exports = {
       })
   },
 
+  getAllKajianNearby: async (req, res) => {
+    const limit = await parseInt(req.query.limit)
+    const page = await parseInt(req.query.page)
+    const dateNow = await dateFormat(new Date(), 'yyyy-mm-dd')
+    const latitude = await req.query.latitude
+    const longitude = await req.query.longitude
+
+    kajianModels
+      .getKajianAll(dateNow, latitude, longitude, limit, page)
+      .then(result => {
+        MiscHelper.resPagination(
+          res,
+          result[0],
+          200,
+          result[1],
+          result[2],
+          result[3]
+        )
+      })
+      .catch(error => {
+        MiscHelper.response(res, 'Bad Request', 404)
+        console.log('errornya ' + error)
+      })
+  },
+
   getAllKajianByCategory: async (req, res) => {
     const checkCategory = await categoryModels.checkCategory(
       req.query.categoryId
