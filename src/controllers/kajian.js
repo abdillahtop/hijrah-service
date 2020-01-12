@@ -53,6 +53,7 @@ module.exports = {
       MiscHelper.response(res, 'Activation Organized first', 200)
     } else {
       if (req.body.categoryId === 3 || req.body.categoryId === 4) {
+        const date = dateFormat(req.body.endDate, 'yyyy-mm-dd')
         const data = {
           kajian_id: uuidv4(),
           adminKajianId: checkOrganized[0].organized_id,
@@ -61,7 +62,7 @@ module.exports = {
           location: req.body.location,
           startDate: req.body.startDate,
           endDate: req.body.endDate,
-          endDateFormat: new Date(),
+          endDateFormat: date + 'T' + req.body.timeEnd,
           timeStart: req.body.timeStart,
           timeEnd: req.body.timeEnd,
           description: req.body.description,
@@ -86,6 +87,7 @@ module.exports = {
             console.log('erronya ' + error)
           })
       } else {
+        const date = dateFormat(req.body.endDate, 'yyyy-mm-dd')
         const data = {
           kajian_id: uuidv4(),
           adminKajianId: checkOrganized[0].organized_id,
@@ -94,7 +96,7 @@ module.exports = {
           location: req.body.location,
           startDate: req.body.startDate,
           endDate: req.body.endDate,
-          endDateFormat: new Date(),
+          endDateFormat: date + 'T' + req.body.timeEnd,
           timeStart: req.body.timeStart,
           timeEnd: req.body.timeEnd,
           description: req.body.description,
@@ -126,6 +128,7 @@ module.exports = {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
     const dateNow = new Date()
+    console.log(dateNow)
     kajianModels
       .getKajianAll(dateNow, limit, page)
       .then(result => {
