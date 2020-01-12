@@ -49,7 +49,7 @@ module.exports = {
             if (!err2) {
               const totalData = result2[0].total
               const totalPage = Math.ceil(totalData / limit)
-              await connection.query('SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ? ) ) * cos( radians( ? ) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians( ? )) ) ) AS distance FROM kajian HAVING distance < 50 WHERE isUstadz = 1 ORDER BY distance LIMIT ? OFFSET ?', [latitude, longitude, latitude, limit, offset], (err3, results) => {
+              await connection.query('SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ? ) ) * cos( radians( ? ) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians( ? )) ) ) AS distance FROM kajian WHERE isUstadz = 1 HAVING distance < 50 ORDER BY distance LIMIT ? OFFSET ?', [latitude, longitude, latitude, limit, offset], (err3, results) => {
                 if (!err3) {
                   resolve([results, totalData, offset + 1, totalPage])
                 } else {
