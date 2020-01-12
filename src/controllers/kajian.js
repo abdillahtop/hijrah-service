@@ -396,14 +396,14 @@ module.exports = {
         detailKajian.location = kajian.locationMap
         detailKajian.latitude = kajian.latitude
         detailKajian.longitude = kajian.longitude
-        if (memberKajian[0] == '') {
+        if (memberKajian[0] === '') {
           listMember.push('Nothing Member here')
         } else {
           listMember.push(memberKajian[0])
         }
         detailKajian.attended = listMember
         detailKajian.countAttended = memberKajian[1]
-        if (listUstadz[0] == '') {
+        if (listUstadz[0] === '') {
           listUstadzs.push('nothing Ustadz here')
         } else {
           listUstadzs.push(listUstadz)
