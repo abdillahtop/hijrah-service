@@ -79,5 +79,17 @@ module.exports = {
         }
       })
     })
+  },
+
+  forgetPassword: (data, email) => {
+    return new Promise((resolve, reject) => {
+      connection.query('UPDATE users SET ? WHERE email = ?', [data, email], (err, result) => {
+        if (!err) {
+          resolve(result)
+        } else {
+          reject(err)
+        }
+      })
+    })
   }
 }

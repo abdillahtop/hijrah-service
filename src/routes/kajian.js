@@ -22,6 +22,7 @@ Route
   .get('/kajian-nearby', KajianController.getAllKajianNearby)
   .get('/kajian-user', Auth.accesstoken, KajianController.getKajianbyUser)
   .get('/find-kajian', KajianController.findKajian)
+  .get('/detail-kajian', KajianController.detailKajian)
   .post('/add-kajian', upload.single('image'), Auth.accesstoken, KajianController.addKajian)
   .post('/add-member-kajian', Auth.accesstoken, KajianController.addMemberKajian)
   .delete('/unjoin-kajian', Auth.accesstoken, KajianController.unjoinKajian)

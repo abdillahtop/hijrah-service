@@ -1,10 +1,12 @@
 const kajianModels = require('../models/kajian')
 const organizedModels = require('../models/organized')
 const userModels = require('../models/users')
+const ustadzModels = require('../models/ustadz')
 const categoryModels = require('../models/category')
 const MiscHelper = require('../helpers/helpers')
 const cloudinary = require('cloudinary')
 const uuidv4 = require('uuid/v4')
+const model = require('../helpers/model')
 const dateFormat = require('dateformat')
 
 module.exports = {
@@ -42,52 +44,89 @@ module.exports = {
     const checkCategory = await categoryModels.checkCategory(req.body.categoryId)
 
     if (checkCategory[0] === undefined) {
-      MiscHelper.response(res, 'Category not found', 404)
+      MiscHelper.response(res, 'Category not found', 401)
       next()
     }
     if (checkOrganized[0] === undefined) {
-      MiscHelper.response(res, 'Organized not found', 404)
+      MiscHelper.response(res, 'Organized not found', 401)
     } else if (checkOrganized[0].activation === '0') {
       MiscHelper.response(res, 'Activation Organized first', 200)
     } else {
-      const data = {
-        kajian_id: uuidv4(),
-        adminKajianId: checkOrganized[0].organized_id,
-        adminKajianName: req.body.adminNameKajian,
-        categoryName: checkCategory[0].name,
-        location: req.body.location,
-        startDate: req.body.startDate,
-        endDate: req.body.endDate,
-        timeStart: req.body.timeStart,
-        timeEnd: req.body.timeEnd,
-        description: req.body.description,
-        title: req.body.title,
-        linkVideo: req.body.linkVideo,
-        kajianPhoneNumber: req.body.phoneNumber,
-        latitude: parseFloat(req.body.latitude),
-        longitude: parseFloat(req.body.longitude),
-        locationMap: req.body.locationMap,
-        publishAt: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
-        active: true,
-        image: await geturl()
+      if (req.body.categoryId === 3 || req.body.categoryId === 4) {
+        const data = {
+          kajian_id: uuidv4(),
+          adminKajianId: checkOrganized[0].organized_id,
+          adminKajianName: req.body.adminNameKajian,
+          categoryName: checkCategory[0].name,
+          location: req.body.location,
+          startDate: req.body.startDate,
+          endDate: req.body.endDate,
+          endDateFormat: new Date(),
+          timeStart: req.body.timeStart,
+          timeEnd: req.body.timeEnd,
+          description: req.body.description,
+          title: req.body.title,
+          linkVideo: req.body.linkVideo,
+          kajianPhoneNumber: req.body.phoneNumber,
+          latitude: parseFloat(req.body.latitude),
+          longitude: parseFloat(req.body.longitude),
+          locationMap: req.body.locationMap,
+          publishAt: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
+          active: true,
+          isUstadz: true,
+          image: await geturl()
+        }
+        kajianModels
+          .addKajian(data)
+          .then((result) => {
+            console.log(result)
+            MiscHelper.response(res, 'Kajian has been Insert', 200)
+          })
+          .catch(error => {
+            MiscHelper.response(res, 'Bad request', 404)
+            console.log('erronya ' + error)
+          })
+      } else {
+        const data = {
+          kajian_id: uuidv4(),
+          adminKajianId: checkOrganized[0].organized_id,
+          adminKajianName: req.body.adminNameKajian,
+          categoryName: checkCategory[0].name,
+          location: req.body.location,
+          startDate: req.body.startDate,
+          endDate: req.body.endDate,
+          endDateFormat: new Date(),
+          timeStart: req.body.timeStart,
+          timeEnd: req.body.timeEnd,
+          description: req.body.description,
+          title: req.body.title,
+          linkVideo: req.body.linkVideo,
+          kajianPhoneNumber: req.body.phoneNumber,
+          latitude: parseFloat(req.body.latitude),
+          longitude: parseFloat(req.body.longitude),
+          locationMap: req.body.locationMap,
+          publishAt: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
+          active: true,
+          isUstadz: false,
+          image: await geturl()
+        }
+        kajianModels
+          .addKajian(data)
+          .then(() => {
+            MiscHelper.response(res, data.kajian_id, 200, 'Kajian has been Insert')
+          })
+          .catch(error => {
+            MiscHelper.response(res, 'Bad request', 404)
+            console.log('erronya ' + error)
+          })
       }
-
-      kajianModels
-        .addKajian(data)
-        .then(() => {
-          MiscHelper.response(res, 'Kajian has been Insert', 200)
-        })
-        .catch(error => {
-          MiscHelper.response(res, 'Bad request', 404)
-          console.log('erronya ' + error)
-        })
     }
   },
 
   getAllKajian: async (req, res) => {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
-    const dateNow = await dateFormat(new Date(), 'yyyy-mm-dd')
+    const dateNow = new Date()
     kajianModels
       .getKajianAll(dateNow, limit, page)
       .then(result => {
@@ -109,7 +148,7 @@ module.exports = {
   getAllKajianNearby: async (req, res) => {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
-    const dateNow = await dateFormat(new Date(), 'yyyy-mm-dd')
+    const dateNow = new Date()
     const latitude = await req.query.latitude
     const longitude = await req.query.longitude
     console.log('query ' + JSON.stringify(req.query))
@@ -137,10 +176,10 @@ module.exports = {
     )
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
-    const dateNow = await dateFormat(new Date(), 'yyyy-mm-dd')
+    const dateNow = new Date()
 
     if (checkCategory[0] === undefined) {
-      MiscHelper.response(res, 'Category not found', 404)
+      MiscHelper.response(res, 'Category not found', 401)
     } else {
       kajianModels
         .getKajianAllbyCategory(dateNow, checkCategory[0].name, limit, page)
@@ -173,18 +212,18 @@ module.exports = {
       req.user_id
     )
     if (checkKajian[0] === undefined) {
-      MiscHelper.response(res, 'Kajian not found', 404)
+      MiscHelper.response(res, 'Kajian not found', 401)
     } else if (checkUser[0] === undefined) {
-      MiscHelper.response(res, 'User not found', 404)
+      MiscHelper.response(res, 'User not found', 401)
     } else if (checkMember[0] !== undefined) {
       MiscHelper.response(res, 'User has been Join Kajian', 200)
-    } else if (checkUser[0].activation === 0) {
-      MiscHelper.response(res, 'You must Activation first', 401)
     } else {
       const data = {
         registration_id: uuidv4(),
         user_id: req.user_id,
         kajian_id: req.body.kajianId,
+        image: checkUser[0].profile_url,
+        name: checkUser[0].name,
         register_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss')
       }
       kajianModels
@@ -242,27 +281,50 @@ module.exports = {
   },
 
   findKajian: async (req, res) => {
+    const catId = await req.query.catId
     const search = await req.query.search
-    kajianModels
-      .findKajian(search)
-      .then(result => {
-        if (result === []) {
-          MiscHelper.response(res, 'list kajian not found', 200)
-        } else {
-          MiscHelper.response(res, result, 200)
-        }
-      })
-      .catch(error => {
-        MiscHelper.response(res, 'Bad Request', 404)
-        console.log('errornya ' + error)
-      })
+    console.log(catId)
+    if (catId === '') {
+      kajianModels
+        .findKajian(search)
+        .then(result => {
+          if (result[0] === undefined) {
+            MiscHelper.response(res, 'list kajian not found', 200)
+          } else {
+            MiscHelper.response(res, result, 200)
+          }
+        })
+        .catch(error => {
+          MiscHelper.response(res, 'Bad Request', 404)
+          console.log('errornya ' + error)
+        })
+    } else {
+      const checkCategory = await categoryModels.checkCategory(catId)
+      if (checkCategory[0] === undefined) {
+        MiscHelper.response(res, 'Category not found', 401)
+      } else {
+        kajianModels.findKajianByCat(checkCategory[0].name, search)
+          .then(result => {
+            console.log(result)
+            if (result[0] === undefined) {
+              MiscHelper.response(res, 'list kajian not found', 200)
+            } else {
+              MiscHelper.response(res, result, 200)
+            }
+          })
+          .catch(error => {
+            MiscHelper.response(res, 'Bad Request', 404)
+            console.log('errornya ' + error)
+          })
+      }
+    }
   },
 
   unjoinKajian: async (req, res) => {
     const kajianId = await req.query.kajianId
     const checkMemberKajian = await kajianModels.checkMemberKajian(kajianId, req.user_id)
     if (checkMemberKajian[0] === undefined) {
-      MiscHelper.response(res, 'you not join in this kajian', 404)
+      MiscHelper.response(res, 'you not join in this kajian', 402)
     } else {
       kajianModels
         .unjoinKajian(req.user_id, kajianId)
@@ -279,7 +341,7 @@ module.exports = {
   deleteKajian: async (req, res) => {
     const checkKajian = await kajianModels.checkKajianbyUserId(req.user_id)
     if (checkKajian[0] === undefined) {
-      MiscHelper.response(res, 'Kajian not found', 404)
+      MiscHelper.response(res, 'Kajian not found', 401)
     } else {
       kajianModels.deleteKajian(req.user_id, checkKajian[0].kajian_id)
         .then(() => {
@@ -288,6 +350,68 @@ module.exports = {
         .catch(() => {
           MiscHelper.response(res, 'Bad Request', 404)
         })
+    }
+  },
+
+  detailKajian: async (req, res) => {
+    const checkKajian = await kajianModels.checkKajian(req.body.kajianId)
+    const checkOrganized = await organizedModels.checkOrganized(checkKajian[0].adminKajianId)
+    const memberKajian = await kajianModels.memberKajian(req.body.kajianId)
+    const listUstadz = await ustadzModels.getUstadzByKajian(req.body.kajianId)
+    const kajian = checkKajian[0]
+    console.log('Cek member Kajina ' + JSON.stringify(memberKajian))
+    if (kajian === undefined) {
+      MiscHelper.response(res, 'Kajian not found', 401)
+    } else {
+      if (checkOrganized[0] === undefined) {
+        MiscHelper.response(res, 'Organized not found', 401)
+      } else {
+        const detailEvent = []
+        const listMember = []
+        const listUstadzs = []
+        const detailKajian = model.detailKajian()
+        detailKajian.title = kajian.title
+        detailKajian.photoKajian = kajian.image
+        detailKajian.linkKajian = kajian.linkVideo
+        const testDate = dateFormat(kajian.startDate, 'ddd, mmmm, dd, yyyy')
+        const testDateEnd = dateFormat(kajian.endDate, 'ddd, mmmm, dd, yyyy')
+        const dateStart = testDate.split(',')
+        const dateEnd = testDateEnd.split(',')
+        if (testDate === testDateEnd) {
+          detailKajian.date = dateStart[2] + dateStart[1] + dateStart[3]
+        } else if (dateStart[1] === dateEnd[1]) {
+          detailKajian.date = dateStart[2] + '-' + dateEnd[2] + dateStart[1] + dateStart[3]
+        } else if (dateStart[1] !== dateEnd[1]) {
+          detailKajian.date = dateStart[2] + '-' + dateEnd[2] + dateStart[1] + '-' + dateEnd[1] + dateStart[3]
+        } else if (dateStart[3] === dateEnd[3]) {
+          detailKajian.date = dateStart[2] + '-' + dateEnd[2] + dateStart[1] + dateStart[3]
+        } else if (dateStart[3] !== dateEnd[3]) {
+          detailKajian.date = dateStart[2] + '-' + dateEnd[2] + dateStart[1] + dateStart[3] + '-' + dateEnd[3]
+        }
+
+        const timeStart = kajian.timeStart.split(':')
+        const timeEnd = kajian.timeEnd.split(':')
+        detailKajian.time = timeStart[0] + ':' + timeStart[1] + ' - ' + timeEnd[0] + ':' + timeEnd[1]
+        detailKajian.description = kajian.description
+        detailKajian.location = kajian.locationMap
+        detailKajian.latitude = kajian.latitude
+        detailKajian.longitude = kajian.longitude
+        if (memberKajian[0] == '') {
+          listMember.push('Nothing Member here')
+        } else {
+          listMember.push(memberKajian[0])
+        }
+        detailKajian.attended = listMember
+        detailKajian.countAttended = memberKajian[1]
+        if (listUstadz[0] == '') {
+          listUstadzs.push('nothing Ustadz here')
+        } else {
+          listUstadzs.push(listUstadz)
+        }
+        detailKajian.ustadz = listUstadzs
+        detailEvent.push(detailKajian)
+        MiscHelper.response(res, detailEvent, 200, 'Get Detail Kajian Success')
+      }
     }
   }
 }

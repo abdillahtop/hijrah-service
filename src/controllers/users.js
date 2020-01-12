@@ -31,7 +31,7 @@ module.exports = {
       .then(resultUser => {
         const result = resultUser[0]
         if (resultUser[0] === undefined) {
-          MiscHelper.response(res, 'user not found', 404)
+          MiscHelper.response(res, 'user not found', 401)
         } else {
           MiscHelper.response(res, result, 200)
         }
@@ -65,7 +65,7 @@ module.exports = {
 
       userModels
         .register(data)
-        .then(async resultRegister => {
+        .then(async () => {
           await MiscHelper.response(res, 'Data has been saved', 200)
           const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -76,7 +76,7 @@ module.exports = {
           })
           const body = await `${domain.baseUrl}/api/v1/user/activation?email=${req.body.email}`
           const mailOptions = {
-            from: 'roronoazum@gmail.com',
+            from: 'helpdesk.hijrahapp@gmail.com',
             to: req.body.email,
             subject: 'Verify Akun',
             html:
@@ -98,7 +98,7 @@ module.exports = {
           console.log(error)
         })
     } else {
-      MiscHelper.response(res, 'Email has been used', 404)
+      MiscHelper.response(res, 'Email has been used', 403)
     }
   },
 
@@ -108,7 +108,7 @@ module.exports = {
     const checkEmail = await userModels.getByEmail(req.body.email)
 
     if (checkEmail[0] === undefined) {
-      MiscHelper.response(res, 'User not found', 404)
+      MiscHelper.response(res, 'User not found', 401)
     } else {
       userModels
         .getByEmail(email)
@@ -165,7 +165,7 @@ module.exports = {
       })
       .catch(error => {
         console.log('inih' + error)
-        MiscHelper.response(res, 'User not found', 404)
+        MiscHelper.response(res, 'User not found', 401)
       })
   },
 
@@ -192,7 +192,7 @@ module.exports = {
       return dataCloudinary
     }
     if (checkUser[0] === undefined) {
-      MiscHelper.response(res, 'User not found', 404)
+      MiscHelper.response(res, 'User not found', 401)
     } else {
       const data = {
         name: req.body.name,
@@ -207,6 +207,32 @@ module.exports = {
         })
         .catch(() => {
           MiscHelper.response(res, 'Bad request', 404)
+        })
+    }
+  },
+
+  forgetPassword: async (req, res) => {
+    const checkEmail = await userModels.getByEmail(req.body.email)
+    if (checkEmail[0] === undefined) {
+      MiscHelper.response(res, 'User not found', 401)
+      console.log('User not found')
+    } else {
+      const salt = MiscHelper.generateSalt(64)
+      const passwordHash = MiscHelper.setPassword(req.body.password, salt)
+
+      const data = {
+        password: passwordHash.passwordHash,
+        salt: passwordHash.salt
+      }
+
+      userModels.forgetPassword(data, req.body.email)
+        .then(() => {
+          MiscHelper.response(res, 'Password change successfull', 200)
+          console.log('Password change successfull')
+        })
+        .catch((err) => {
+          MiscHelper.response(res, 'Bad Request', 404)
+          console.log('Error : ' + err)
         })
     }
   }

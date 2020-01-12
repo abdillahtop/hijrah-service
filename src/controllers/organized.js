@@ -19,7 +19,7 @@ module.exports = {
       const checkUser = await organizedModels.getUser(req.user_id)
 
       if (checkUser[0] === undefined) {
-        MiscHelper.response(res, 'User not found', 404)
+        MiscHelper.response(res, 'User not found', 401)
       } else {
         const data = {
           organized_id: uuidv4(),
@@ -48,7 +48,7 @@ module.exports = {
           })
       }
     } else {
-      MiscHelper.response(res, 'Organized has been used', 404)
+      MiscHelper.response(res, 'Organized has been used', 403)
     }
   },
 
@@ -56,7 +56,7 @@ module.exports = {
     organizedModels.getOrganizer(req.user_id)
       .then((result) => {
         if (result[0] === undefined) {
-          MiscHelper.response(res, 'Organized not found', 404)
+          MiscHelper.response(res, 'Organized not found', 401)
         } else {
           MiscHelper.response(res, result[0], 200)
         }
@@ -71,7 +71,7 @@ module.exports = {
     const checkOrganized = await organizedModels.checkOrganized(req.query.organizedId)
 
     if (checkOrganized[0] === undefined) {
-      MiscHelper.response(res, 'Organized not found', 404)
+      MiscHelper.response(res, 'Organized not found', 401)
     } else {
       organizedModels.activationOrganized(req.query.organizedId)
         .then(() => {
@@ -87,7 +87,7 @@ module.exports = {
     const checkOrganized = await organizedModels.checkOrganized(req.params.organizedId)
 
     if (checkOrganized[0] === undefined) {
-      MiscHelper.response(res, 'Organized not found', 404)
+      MiscHelper.response(res, 'Organized not found', 401)
     } else {
       organizedModels.deleteOrganized(req.params.organizedId, checkOrganized[0].user_id)
         .then(() => {

@@ -20,6 +20,7 @@ Route
   .get('/userDetail', Auth.accesstoken, UserController.userDetail)
   .post('/activation', UserController.activationUser)
   .post('/register', UserController.register, sending)
+  .post('/forget-password', UserController.forgetPassword)
   .post('/login', UserController.login)
   .patch('/update-profile', upload.single('image'), Auth.accesstoken, UserController.updateProfile)
 module.exports = Route

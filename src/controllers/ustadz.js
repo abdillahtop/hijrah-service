@@ -34,7 +34,7 @@ module.exports = {
     }
     const checkKajian = await kajianModels.checkKajian(req.body.kajianId)
     if (checkKajian[0] === undefined) {
-      MiscHelper.response(res, 'Kajian not found', 404)
+      MiscHelper.response(res, 'Kajian not found', 401)
     } else {
       const data = {
         kajian_id: checkKajian[0].kajian_id,
@@ -43,7 +43,7 @@ module.exports = {
         image: await geturl()
       }
       ustadzModels
-        .addUstadz(data)
+        .addUstadz(data, req.body.kajianId)
         .then(() => {
           MiscHelper.response(res, 'Add ustadz success!', 200)
         })
@@ -71,7 +71,7 @@ module.exports = {
     const kajianId = req.query.kajianId
     ustadzModels.getUstadzByKajian(kajianId).then(result => {
       if (result === '') {
-        MiscHelper.response(res, 'Not found ustadz in this kajian', 404)
+        MiscHelper.response(res, 'Not found ustadz in this kajian', 401)
       } else {
         MiscHelper.response(res, result, 200)
       }
