@@ -78,8 +78,7 @@ module.exports = {
         }
         kajianModels
           .addKajian(data)
-          .then((result) => {
-            console.log(result)
+          .then(() => {
             MiscHelper.response(res, 'Kajian has been Insert', 200)
           })
           .catch(error => {
@@ -151,7 +150,6 @@ module.exports = {
     const dateNow = new Date()
     const latitude = await req.query.latitude
     const longitude = await req.query.longitude
-    console.log('query ' + JSON.stringify(req.query))
     kajianModels
       .getKajianAllNearby(dateNow, latitude, longitude, limit, page)
       .then(result => {
@@ -283,7 +281,6 @@ module.exports = {
   findKajian: async (req, res) => {
     const catId = await req.query.catId
     const search = await req.query.search
-    console.log(catId)
     if (catId === '') {
       kajianModels
         .findKajian(search)
@@ -304,8 +301,7 @@ module.exports = {
         MiscHelper.response(res, 'Category not found', 401)
       } else {
         kajianModels.findKajianByCat(checkCategory[0].name, search)
-          .then(result => {
-            console.log(result)
+          .then(() => {
             if (result[0] === undefined) {
               MiscHelper.response(res, 'list kajian not found', 200)
             } else {
@@ -359,7 +355,6 @@ module.exports = {
     const memberKajian = await kajianModels.memberKajian(req.body.kajianId)
     const listUstadz = await ustadzModels.getUstadzByKajian(req.body.kajianId)
     const kajian = checkKajian[0]
-    console.log('Cek member Kajina ' + JSON.stringify(memberKajian))
     if (kajian === undefined) {
       MiscHelper.response(res, 'Kajian not found', 401)
     } else {
