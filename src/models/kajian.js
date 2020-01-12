@@ -51,7 +51,7 @@ module.exports = {
               const totalPage = Math.ceil(totalData / limit)
               await connection.query('SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ? ) ) * cos( radians( ? ) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians( ? )) ) ) AS distance FROM kajian WHERE isUstadz = 1 HAVING distance < 50 ORDER BY distance LIMIT ? OFFSET ?', [latitude, longitude, latitude, limit, offset], (err3, results) => {
                 if (!err3) {
-                  resolve([results, totalData, offset + 1, totalPage])
+                  resolve([results, totalData, page, totalPage])
                 } else {
                   reject(new Error(err3))
                 }
@@ -78,7 +78,7 @@ module.exports = {
               const totalPage = Math.ceil(totalData / limit)
               await connection.query('SELECT * FROM kajian WHERE isUstadz = 1 AND categoryName = ? ORDER BY startDate desc LIMIT ? OFFSET ?', [categoryName, limit, offset], (err3, results) => {
                 if (!err3) {
-                  resolve([results, totalData, offset + 1, totalPage])
+                  resolve([results, totalData, page, totalPage])
                 } else {
                   reject(new Error(err3))
                 }
@@ -127,7 +127,7 @@ module.exports = {
           const totalPage = Math.ceil(totalData / limit)
           connection.query('SELECT users.name, users.profile_url FROM users JOIN member_kajian ON users.user_id = member_kajian.user_id WHERE member_kajian.kajian_id = ? ORDER BY users.name asc LIMIT ? OFFSET ?', [kajianId, limit, offset], (error, results) => {
             if (!error) {
-              resolve([results, totalData, offset + 1, totalPage])
+              resolve([results, totalData, page, totalPage])
             } else {
               reject(error)
             }

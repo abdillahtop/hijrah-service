@@ -301,7 +301,7 @@ module.exports = {
         MiscHelper.response(res, 'Category not found', 401)
       } else {
         kajianModels.findKajianByCat(checkCategory[0].name, search)
-          .then(() => {
+          .then((result) => {
             if (result[0] === undefined) {
               MiscHelper.response(res, 'list kajian not found', 200)
             } else {
