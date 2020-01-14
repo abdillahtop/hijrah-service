@@ -158,10 +158,10 @@ module.exports = {
     })
   },
 
-  findKajian: (search) => {
+  findKajian: (latitude, longitude, search) => {
     return new Promise((resolve, reject) => {
       const find = `${search}%`
-      connection.query('SELECT * FROM kajian WHERE title LIKE ? ORDER BY title asc LIMIT 30 ', find, (err, result) => {
+      connection.query('SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ? ) ) * cos( radians( ? ) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians( ? )) ) ) AS distance FROM kajian WHERE title LIKE ? AND isUstadz = 1 HAVING distance < 1000 ORDER BY distance LIMIT 20 ', [latitude, longitude, latitude, find], (err, result) => {
         if (!err) {
           resolve(result)
         } else {
@@ -171,10 +171,10 @@ module.exports = {
     })
   },
 
-  findKajianByCat: (catId, search) => {
+  findKajianByCat: (catId, latitude, longitude, search) => {
     return new Promise((resolve, reject) => {
       const find = `${search}%`
-      connection.query('SELECT * FROM kajian WHERE categoryName = ? AND title LIKE ? ORDER BY title asc LIMIT 30 ', [catId, find], (err, result) => {
+      connection.query('SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ? ) ) * cos( radians( ? ) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians( ? )) ) ) AS distance FROM kajian WHERE title LIKE ? AND isUstadz = 1 AND categoryName = ? HAVING distance < 1000 ORDER BY distance LIMIT 20 ', [latitude, longitude, latitude, find, catId], (err, result) => {
         if (!err) {
           resolve(result)
         } else {

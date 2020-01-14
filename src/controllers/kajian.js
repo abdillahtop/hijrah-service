@@ -284,9 +284,11 @@ module.exports = {
   findKajian: async (req, res) => {
     const catId = await req.query.catId
     const search = await req.query.search
+    const latitude = await req.query.latitude
+    const longitude = await req.query.longitude
     if (catId === '') {
       kajianModels
-        .findKajian(search)
+        .findKajian(latitude, longitude, search)
         .then(result => {
           if (result[0] === undefined) {
             MiscHelper.response(res, 'list kajian not found', 404)
@@ -303,7 +305,7 @@ module.exports = {
       if (checkCategory[0] === undefined) {
         MiscHelper.response(res, 'Category not found', 404)
       } else {
-        kajianModels.findKajianByCat(checkCategory[0].name, search)
+        kajianModels.findKajianByCat(checkCategory[0].name, latitude, longitude, search)
           .then((result) => {
             if (result[0] === undefined) {
               MiscHelper.response(res, 'list kajian not found', 404)
