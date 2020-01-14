@@ -19,7 +19,7 @@ module.exports = {
       const checkUser = await organizedModels.getUser(req.user_id)
 
       if (checkUser[0] === undefined) {
-        MiscHelper.response(res, 'User not found', 401)
+        MiscHelper.response(res, 'User not found', 404)
       } else {
         const data = {
           organized_id: uuidv4(),
@@ -43,12 +43,12 @@ module.exports = {
             MiscHelper.response(res, 'Organized has been register', 200)
           })
           .catch(error => {
-            MiscHelper.response(res, error, 404)
+            MiscHelper.response(res, 'Bad Request', 400)
             console.log('error ' + error)
           })
       }
     } else {
-      MiscHelper.response(res, 'Organized has been used', 403)
+      MiscHelper.response(res, 'Organized has been used', 401)
     }
   },
 
@@ -56,13 +56,13 @@ module.exports = {
     organizedModels.getOrganizer(req.user_id)
       .then((result) => {
         if (result[0] === undefined) {
-          MiscHelper.response(res, 'Organized not found', 401)
+          MiscHelper.response(res, 'Organized not found', 404)
         } else {
           MiscHelper.response(res, result[0], 200)
         }
       })
       .catch((err) => {
-        MiscHelper.response(res, 'Bad request', 404)
+        MiscHelper.response(res, 'Bad request', 400)
         console.log(err)
       })
   },

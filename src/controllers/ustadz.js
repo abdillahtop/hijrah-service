@@ -24,7 +24,7 @@ module.exports = {
       let dataCloudinary
       await cloudinary.uploader.upload(path, (result) => {
         if (result.error) {
-          MiscHelper.response(res, 'Cloud Server disable', 404)
+          MiscHelper.response(res, 'Cloud Server disable', 500)
         } else {
           dataCloudinary = result.url
         }
@@ -34,7 +34,7 @@ module.exports = {
     }
     const checkKajian = await kajianModels.checkKajian(req.body.kajianId)
     if (checkKajian[0] === undefined) {
-      MiscHelper.response(res, 'Kajian not found', 401)
+      MiscHelper.response(res, 'Kajian not found', 404)
     } else {
       const data = {
         kajian_id: checkKajian[0].kajian_id,
@@ -48,7 +48,7 @@ module.exports = {
           MiscHelper.response(res, 'Add ustadz success!', 200)
         })
         .catch(error => {
-          MiscHelper.response(res, 'Bad request', 404)
+          MiscHelper.response(res, 'Bad request', 400)
           console.log('error ' + error)
         })
     }
@@ -62,7 +62,7 @@ module.exports = {
         MiscHelper.response(res, 'Ustadz has been delete', 200)
       })
       .catch(error => {
-        MiscHelper.response(res, 'Bad request!', 404)
+        MiscHelper.response(res, 'Bad request!', 400)
         console.log('Err ' + error)
       })
   },
@@ -71,7 +71,7 @@ module.exports = {
     const kajianId = req.query.kajianId
     ustadzModels.getUstadzByKajian(kajianId).then(result => {
       if (result === '') {
-        MiscHelper.response(res, 'Not found ustadz in this kajian', 401)
+        MiscHelper.response(res, 'Not found ustadz in this kajian', 404)
       } else {
         MiscHelper.response(res, result, 200)
       }

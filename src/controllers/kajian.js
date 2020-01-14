@@ -29,7 +29,7 @@ module.exports = {
       let dataCloudinary
       await cloudinary.uploader.upload(path, (result) => {
         if (result.error) {
-          MiscHelper.response(res, 'Cloud Server disable', 404)
+          MiscHelper.response(res, 'Cloud Server disable', 500)
         } else {
           dataCloudinary = result.url
         }
@@ -44,13 +44,13 @@ module.exports = {
     const checkCategory = await categoryModels.checkCategory(req.body.categoryId)
 
     if (checkCategory[0] === undefined) {
-      MiscHelper.response(res, 'Category not found', 401)
+      MiscHelper.response(res, 'Category not found', 404)
       next()
     }
     if (checkOrganized[0] === undefined) {
-      MiscHelper.response(res, 'Organized not found', 401)
+      MiscHelper.response(res, 'Organized not found', 404)
     } else if (checkOrganized[0].activation === '0') {
-      MiscHelper.response(res, 'Activation Organized first', 200)
+      MiscHelper.response(res, 'Activation Organized first', 401)
     } else {
       if (req.body.categoryId === 3 || req.body.categoryId === 4) {
         const date = dateFormat(req.body.endDate, 'yyyy-mm-dd')
@@ -83,7 +83,7 @@ module.exports = {
             MiscHelper.response(res, 'Kajian has been Insert', 200)
           })
           .catch(error => {
-            MiscHelper.response(res, 'Bad request', 404)
+            MiscHelper.response(res, 'Bad request', 400)
             console.log('erronya ' + error)
           })
       } else {
@@ -117,7 +117,7 @@ module.exports = {
             MiscHelper.response(res, data.kajian_id, 200, 'Kajian has been Insert')
           })
           .catch(error => {
-            MiscHelper.response(res, 'Bad request', 404)
+            MiscHelper.response(res, 'Bad request', 400)
             console.log('erronya ' + error)
           })
       }
@@ -142,7 +142,7 @@ module.exports = {
         )
       })
       .catch(error => {
-        MiscHelper.response(res, 'Bad Request', 404)
+        MiscHelper.response(res, 'Bad Request', 400)
         console.log('errornya ' + error)
       })
   },
@@ -166,7 +166,7 @@ module.exports = {
         )
       })
       .catch(error => {
-        MiscHelper.response(res, 'Bad Request', 404)
+        MiscHelper.response(res, 'Bad Request', 400)
         console.log('errornya ' + error)
       })
   },
@@ -180,13 +180,13 @@ module.exports = {
     const dateNow = new Date()
 
     if (checkCategory[0] === undefined) {
-      MiscHelper.response(res, 'Category not found', 401)
+      MiscHelper.response(res, 'Category not found', 404)
     } else {
       kajianModels
         .getKajianAllbyCategory(dateNow, checkCategory[0].name, limit, page)
         .then(result => {
           if (result[0] === 0) {
-            MiscHelper.response(res, 'Kajian Not Found in This Category', 200)
+            MiscHelper.response(res, 'Kajian Not Found in This Category', 404)
           } else {
             MiscHelper.resPagination(
               res,
@@ -199,7 +199,7 @@ module.exports = {
           }
         })
         .catch(error => {
-          MiscHelper.response(res, 'Bad Request', 404)
+          MiscHelper.response(res, 'Bad Request', 400)
           console.log('errornya ' + error)
         })
     }
@@ -213,11 +213,11 @@ module.exports = {
       req.user_id
     )
     if (checkKajian[0] === undefined) {
-      MiscHelper.response(res, 'Kajian not found', 401)
+      MiscHelper.response(res, 'Kajian not found', 404)
     } else if (checkUser[0] === undefined) {
-      MiscHelper.response(res, 'User not found', 401)
+      MiscHelper.response(res, 'User not found', 404)
     } else if (checkMember[0] !== undefined) {
-      MiscHelper.response(res, 'User has been Join Kajian', 200)
+      MiscHelper.response(res, 'User has been Join Kajian', 201)
     } else {
       const data = {
         registration_id: uuidv4(),
@@ -233,7 +233,7 @@ module.exports = {
           MiscHelper.response(res, 'Member Kajian has been successfull', 200)
         })
         .catch(() => {
-          MiscHelper.response(res, 'Bad Request', 404)
+          MiscHelper.response(res, 'Bad Request', 400)
         })
     }
   },
@@ -246,7 +246,7 @@ module.exports = {
       .memberKajianAll(kajianId, limit, page)
       .then(result => {
         if (result[0] === '') {
-          MiscHelper.response(res, 'Not found member', 200)
+          MiscHelper.response(res, 'Not found member', 404)
         } else {
           MiscHelper.resPagination(
             res,
@@ -259,7 +259,7 @@ module.exports = {
         }
       })
       .catch(error => {
-        MiscHelper.response(res, 'Bad Request', 404)
+        MiscHelper.response(res, 'Bad Request', 400)
         console.log('errornya ' + error)
       })
   },
@@ -270,13 +270,13 @@ module.exports = {
       .getKajianByUser(req.user_id, active)
       .then(result => {
         if (result === '') {
-          MiscHelper.resPagination(res, 'Kajian not found', 200)
+          MiscHelper.resPagination(res, 'Kajian not found', 404)
         } else {
           MiscHelper.resPagination(res, result, 200)
         }
       })
       .catch(error => {
-        MiscHelper.response(res, 'Bad Request', 404)
+        MiscHelper.response(res, 'Bad Request', 400)
         console.log('errornya ' + error)
       })
   },
@@ -289,30 +289,30 @@ module.exports = {
         .findKajian(search)
         .then(result => {
           if (result[0] === undefined) {
-            MiscHelper.response(res, 'list kajian not found', 200)
+            MiscHelper.response(res, 'list kajian not found', 404)
           } else {
             MiscHelper.response(res, result, 200)
           }
         })
         .catch(error => {
-          MiscHelper.response(res, 'Bad Request', 404)
+          MiscHelper.response(res, 'Bad Request', 400)
           console.log('errornya ' + error)
         })
     } else {
       const checkCategory = await categoryModels.checkCategory(catId)
       if (checkCategory[0] === undefined) {
-        MiscHelper.response(res, 'Category not found', 401)
+        MiscHelper.response(res, 'Category not found', 404)
       } else {
         kajianModels.findKajianByCat(checkCategory[0].name, search)
           .then((result) => {
             if (result[0] === undefined) {
-              MiscHelper.response(res, 'list kajian not found', 200)
+              MiscHelper.response(res, 'list kajian not found', 404)
             } else {
               MiscHelper.response(res, result, 200)
             }
           })
           .catch(error => {
-            MiscHelper.response(res, 'Bad Request', 404)
+            MiscHelper.response(res, 'Bad Request', 400)
             console.log('errornya ' + error)
           })
       }
@@ -323,7 +323,7 @@ module.exports = {
     const kajianId = await req.query.kajianId
     const checkMemberKajian = await kajianModels.checkMemberKajian(kajianId, req.user_id)
     if (checkMemberKajian[0] === undefined) {
-      MiscHelper.response(res, 'you not join in this kajian', 402)
+      MiscHelper.response(res, 'you not join in this kajian', 401)
     } else {
       kajianModels
         .unjoinKajian(req.user_id, kajianId)
@@ -331,7 +331,7 @@ module.exports = {
           MiscHelper.response(res, 'Success Unjoin Event', 200)
         })
         .catch(error => {
-          MiscHelper.response(res, 'Bad request', 404)
+          MiscHelper.response(res, 'Bad request', 400)
           console.log('error ' + error)
         })
     }
@@ -340,14 +340,14 @@ module.exports = {
   deleteKajian: async (req, res) => {
     const checkKajian = await kajianModels.checkKajianbyUserId(req.user_id)
     if (checkKajian[0] === undefined) {
-      MiscHelper.response(res, 'Kajian not found', 401)
+      MiscHelper.response(res, 'Kajian not found', 404)
     } else {
       kajianModels.deleteKajian(req.user_id, checkKajian[0].kajian_id)
         .then(() => {
           MiscHelper.response(res, 'Kajian has been delete', 200)
         })
         .catch(() => {
-          MiscHelper.response(res, 'Bad Request', 404)
+          MiscHelper.response(res, 'Bad Request', 400)
         })
     }
   },
@@ -359,10 +359,10 @@ module.exports = {
     const listUstadz = await ustadzModels.getUstadzByKajian(req.body.kajianId)
     const kajian = checkKajian[0]
     if (kajian === undefined) {
-      MiscHelper.response(res, 'Kajian not found', 401)
+      MiscHelper.response(res, 'Kajian not found', 404)
     } else {
       if (checkOrganized[0] === undefined) {
-        MiscHelper.response(res, 'Organized not found', 401)
+        MiscHelper.response(res, 'Organized not found', 404)
       } else {
         const detailEvent = []
         const listMember = []

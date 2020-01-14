@@ -11,7 +11,7 @@ module.exports = {
 
   userDetail: (userid) => {
     return new Promise((resolve, reject) => {
-      connection.query('SELECT * FROM users WHERE user_id = ?', userid, (err, result) => {
+      connection.query('SELECT user_id, email,profile_url, phone_number, gender, activation, birth_date, created_at, role_id, verified, isOrganized FROM users WHERE user_id = ?', userid, (err, result) => {
         if (!err) {
           resolve(result)
         } else {

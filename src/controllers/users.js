@@ -31,13 +31,13 @@ module.exports = {
       .then(resultUser => {
         const result = resultUser[0]
         if (resultUser[0] === undefined) {
-          MiscHelper.response(res, 'user not found', 401)
+          MiscHelper.response(res, 'user not found', 404)
         } else {
           MiscHelper.response(res, result, 200)
         }
       })
       .catch(error => {
-        MiscHelper.response(res, 'Bad request', 404)
+        MiscHelper.response(res, 'Bad request', 400)
         console.log(error)
       })
   },
@@ -98,7 +98,7 @@ module.exports = {
           console.log(error)
         })
     } else {
-      MiscHelper.response(res, 'Email has been used', 403)
+      MiscHelper.response(res, 'Email has been used', 401)
     }
   },
 
@@ -108,7 +108,7 @@ module.exports = {
     const checkEmail = await userModels.getByEmail(req.body.email)
 
     if (checkEmail[0] === undefined) {
-      MiscHelper.response(res, 'User not found', 401)
+      MiscHelper.response(res, 'User not found', 404)
     } else {
       userModels
         .getByEmail(email)
@@ -129,9 +129,13 @@ module.exports = {
             delete dataUser.password
             // delete dataUser.token
             userModels.updateToken(dataUser.token, dataUser.email)
-            return MiscHelper.response(res, dataUser.token, 200)
+            const data = {
+              token: dataUser.token,
+              activation: dataUser.activation
+            }
+            return MiscHelper.response(res, data, 200)
           } else {
-            return MiscHelper.response(res, null, 403, 'Wrong password!')
+            return MiscHelper.response(res, null, 401, 'Wrong password!')
           }
         })
         .catch(error => {
@@ -146,11 +150,11 @@ module.exports = {
       .getByEmail(email)
       .then(result => {
         if (validate.isEmpty(email)) {
-          MiscHelper.response(res, 'need token!', 403)
+          MiscHelper.response(res, 'need token!', 401)
         } else {
           const dataUser = result[0]
           if (dataUser.activation === '1') {
-            MiscHelper.response(res, 'User already actived', 202)
+            MiscHelper.response(res, 'User already actived', 201)
           } else {
             userModels
               .activationUser(email)
@@ -158,14 +162,14 @@ module.exports = {
                 MiscHelper.response(res, 'User has been actived', 200)
               })
               .catch(() => {
-                MiscHelper.response(res, 'Bad Request', 404)
+                MiscHelper.response(res, 'Bad Request', 400)
               })
           }
         }
       })
       .catch(error => {
         console.log('inih' + error)
-        MiscHelper.response(res, 'User not found', 401)
+        MiscHelper.response(res, 'User not found', 404)
       })
   },
 
@@ -183,7 +187,7 @@ module.exports = {
       let dataCloudinary
       await cloudinary.uploader.upload(path, (result) => {
         if (result.error) {
-          MiscHelper.response(res, 'Cloud Server disable', 404)
+          MiscHelper.response(res, 'Cloud Server disable', 500)
         } else {
           dataCloudinary = result.url
         }
@@ -192,7 +196,7 @@ module.exports = {
       return dataCloudinary
     }
     if (checkUser[0] === undefined) {
-      MiscHelper.response(res, 'User not found', 401)
+      MiscHelper.response(res, 'User not found', 404)
     } else {
       const data = {
         name: req.body.name,
@@ -206,7 +210,7 @@ module.exports = {
           MiscHelper.response(res, 'Data has been updated', 200)
         })
         .catch(() => {
-          MiscHelper.response(res, 'Bad request', 404)
+          MiscHelper.response(res, 'Bad request', 400)
         })
     }
   },
@@ -214,8 +218,7 @@ module.exports = {
   forgetPassword: async (req, res) => {
     const checkEmail = await userModels.getByEmail(req.body.email)
     if (checkEmail[0] === undefined) {
-      MiscHelper.response(res, 'User not found', 401)
-      console.log('User not found')
+      MiscHelper.response(res, 'User not found', 404)
     } else {
       const salt = MiscHelper.generateSalt(64)
       const passwordHash = MiscHelper.setPassword(req.body.password, salt)
@@ -231,7 +234,7 @@ module.exports = {
           console.log('Password change successfull')
         })
         .catch((err) => {
-          MiscHelper.response(res, 'Bad Request', 404)
+          MiscHelper.response(res, 'Bad Request', 400)
           console.log('Error : ' + err)
         })
     }
