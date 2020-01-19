@@ -67,6 +67,33 @@ module.exports = {
     })
   },
 
+  getKajianAllPopuler: (dateNow, latitude, longitude, limit, page) => {
+    const offset = (limit * page) - limit
+    return new Promise((resolve, reject) => {
+      connection.query('UPDATE kajian SET active = ? WHERE endDate <= ?', [0, dateNow], async (err1, result1) => {
+        if (!err1) {
+          await connection.query('SELECT count(*) as total FROM kajian WHERE isUstadz = 1', async (err2, result2) => {
+            if (!err2) {
+              const totalData = result2[0].total
+              const totalPage = Math.ceil(totalData / limit)
+              await connection.query('SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ? ) ) * cos( radians( ? ) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians( ? )) ) ) AS distance FROM kajian WHERE isUstadz = 1 HAVING distance < 50 ORDER BY count_member desc LIMIT ? OFFSET ?', [latitude, longitude, latitude, limit, offset], (err3, results) => {
+                if (!err3) {
+                  resolve([results, totalData, page, totalPage])
+                } else {
+                  reject(new Error(err3))
+                }
+              })
+            } else {
+              reject(new Error(err2))
+            }
+          })
+        } else {
+          reject(new Error(err1))
+        }
+      })
+    })
+  },
+
   getKajianAllbyCategory: (dateNow, categoryName, limit, page) => {
     const offset = (limit * page) - limit
     return new Promise((resolve, reject) => {
@@ -106,11 +133,17 @@ module.exports = {
     })
   },
 
-  addMemberKajian: (data) => {
+  addMemberKajian: (data, countMember, kajianId) => {
     return new Promise((resolve, reject) => {
       connection.query('INSERT INTO member_kajian SET ?', data, (err, result) => {
         if (!err) {
-          resolve(result)
+          connection.query('UPDATE kajian SET count_member = ? WHERE kajian_id = ?', [countMember, kajianId], (err1, result1) => {
+            if (!err1) {
+              resolve(result1)
+            } else {
+              reject(err1)
+            }
+          })
         } else {
           reject(new Error(err))
         }
@@ -223,7 +256,7 @@ module.exports = {
 
   getKajianByUser: (userId, active) => {
     return new Promise((resolve, reject) => {
-      connection.query('SELECT kajian.title, kajian.categoryName, kajian.startDate, kajian.location FROM kajian JOIN member_kajian ON kajian.kajian_id = member_kajian.kajian_id WHERE member_kajian.user_id = ? AND kajian.active = ?', [userId, active], async (err, result) => {
+      connection.query('SELECT kajian.title, kajian.categoryName, kajian.startDate, kajian.endDate, timeStart, timeEnd, kajian.location FROM kajian JOIN member_kajian ON kajian.kajian_id = member_kajian.kajian_id WHERE member_kajian.user_id = ? AND kajian.active = ?', [userId, active], async (err, result) => {
         if (!err) {
           await resolve(result)
         } else {
@@ -233,11 +266,17 @@ module.exports = {
     })
   },
 
-  unjoinKajian: (userId, kajianId) => {
+  unjoinKajian: (userId, countMember, kajianId) => {
     return new Promise((resolve, reject) => {
       connection.query('DELETE FROM member_kajian WHERE user_id = ? AND kajian_id = ?', [userId, kajianId], async (err, result) => {
         if (!err) {
-          await resolve(result)
+          connection.query('UPDATE kajian SET count_member = ? WHERE kajian_id = ?', [countMember, kajianId], (err1, result1) => {
+            if (!err1) {
+              resolve(result1)
+            } else {
+              reject(err1)
+            }
+          })
         } else {
           await reject(new Error(err))
         }

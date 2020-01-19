@@ -66,7 +66,7 @@ module.exports = {
       userModels
         .register(data)
         .then(async () => {
-          await MiscHelper.response(res, 'Data has been saved', 200)
+          const result = await userModels.getByEmail(req.body.email)
           const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -93,6 +93,28 @@ module.exports = {
               console.log('Sukses Send email')
             }
           })
+
+          const dataUser = result[0]
+          const usePassword = MiscHelper.setPassword(req.body.password, dataUser.salt)
+            .passwordHash
+          if (usePassword === dataUser.password) {
+            dataUser.token = jwt.sign(
+              {
+                user_id: dataUser.user_id
+              },
+              process.env.SECRET_KEY,
+              { expiresIn: '1000h' }
+            )
+
+            delete dataUser.salt
+            delete dataUser.password
+          }
+          userModels.updateToken(dataUser.token, dataUser.email)
+          const data = {
+            token: dataUser.token,
+            activation: dataUser.activation
+          }
+          return MiscHelper.response(res, 'Email inserted', 200, data)
         })
         .catch(error => {
           console.log(error)

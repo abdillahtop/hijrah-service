@@ -75,7 +75,8 @@ module.exports = {
           publishAt: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
           active: true,
           isUstadz: true,
-          image: await geturl()
+          image: await geturl(),
+          count_member: 0
         }
         kajianModels
           .addKajian(data)
@@ -171,6 +172,30 @@ module.exports = {
       })
   },
 
+  getAllKajianPopuler: async (req, res) => {
+    const limit = await parseInt(req.query.limit)
+    const page = await parseInt(req.query.page)
+    const dateNow = new Date()
+    const latitude = await req.query.latitude
+    const longitude = await req.query.longitude
+    kajianModels
+      .getKajianAllPopuler(dateNow, latitude, longitude, limit, page)
+      .then(result => {
+        MiscHelper.resPagination(
+          res,
+          result[0],
+          200,
+          result[1],
+          result[2],
+          result[3]
+        )
+      })
+      .catch(error => {
+        MiscHelper.response(res, 'Bad Request', 400)
+        console.log('errornya ' + error)
+      })
+  },
+
   getAllKajianByCategory: async (req, res) => {
     const checkCategory = await categoryModels.checkCategory(
       req.query.categoryId
@@ -212,6 +237,8 @@ module.exports = {
       req.body.kajianId,
       req.user_id
     )
+    const memberKajian = await kajianModels.memberKajian(req.body.kajianId)
+    console.log('JSon ' + JSON.stringify(memberKajian))
     if (checkKajian[0] === undefined) {
       MiscHelper.response(res, 'Kajian not found', 404)
     } else if (checkUser[0] === undefined) {
@@ -228,12 +255,12 @@ module.exports = {
         register_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss')
       }
       kajianModels
-        .addMemberKajian(data)
+        .addMemberKajian(data, memberKajian[0] == 0 ? 1 : memberKajian[0].length + 1, req.body.kajianId)
         .then(() => {
           MiscHelper.response(res, 'Member Kajian has been successfull', 200)
         })
-        .catch(() => {
-          MiscHelper.response(res, 'Bad Request', 400)
+        .catch((err) => {
+          MiscHelper.response(res, 'Bad Request', 400, err)
         })
     }
   },
@@ -324,11 +351,13 @@ module.exports = {
   unjoinKajian: async (req, res) => {
     const kajianId = await req.query.kajianId
     const checkMemberKajian = await kajianModels.checkMemberKajian(kajianId, req.user_id)
+    const memberKajian = await kajianModels.memberKajian(req.query.kajianId)
     if (checkMemberKajian[0] === undefined) {
       MiscHelper.response(res, 'you not join in this kajian', 401)
     } else {
+      console.log(JSON.stringify(memberKajian[0].length))
       kajianModels
-        .unjoinKajian(req.user_id, kajianId)
+        .unjoinKajian(req.user_id, memberKajian[0].length - 1, kajianId)
         .then(() => {
           MiscHelper.response(res, 'Success Unjoin Event', 200)
         })
