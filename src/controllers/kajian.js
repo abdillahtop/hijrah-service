@@ -52,7 +52,7 @@ module.exports = {
     } else if (checkOrganized[0].activation === '0') {
       MiscHelper.response(res, 'Activation Organized first', 401)
     } else {
-      if (req.body.categoryId === 3 || req.body.categoryId === 4) {
+      if (req.body.categoryId === 3) {
         const date = dateFormat(req.body.endDate, 'yyyy-mm-dd')
         const data = {
           kajian_id: uuidv4(),
@@ -211,7 +211,7 @@ module.exports = {
         .getKajianAllbyCategory(dateNow, checkCategory[0].name, limit, page)
         .then(result => {
           if (result[0] === 0) {
-            MiscHelper.response(res, 'Kajian Not Found in This Category', 404)
+            MiscHelper.response(res, 'Kajian Not Found in This Category', 204)
           } else {
             MiscHelper.resPagination(
               res,
@@ -238,7 +238,6 @@ module.exports = {
       req.user_id
     )
     const memberKajian = await kajianModels.memberKajian(req.body.kajianId)
-    console.log('JSon ' + JSON.stringify(memberKajian))
     if (checkKajian[0] === undefined) {
       MiscHelper.response(res, 'Kajian not found', 404)
     } else if (checkUser[0] === undefined) {
@@ -273,7 +272,7 @@ module.exports = {
       .memberKajianAll(kajianId, limit, page)
       .then(result => {
         if (result[0] === '') {
-          MiscHelper.response(res, 'Not found member', 404)
+          MiscHelper.response(res, 'Not found member', 204)
         } else {
           MiscHelper.resPagination(
             res,
@@ -297,7 +296,7 @@ module.exports = {
       .getKajianByUser(req.user_id, active)
       .then(result => {
         if (result === '') {
-          MiscHelper.resPagination(res, 'Kajian not found', 404)
+          MiscHelper.resPagination(res, 'Kajian not found', 204)
         } else {
           MiscHelper.resPagination(res, result, 200)
         }
@@ -318,7 +317,7 @@ module.exports = {
         .findKajian(latitude, longitude, search)
         .then(result => {
           if (result[0] === undefined) {
-            MiscHelper.response(res, 'list kajian not found', 404)
+            MiscHelper.response(res, 'list kajian not found', 204)
           } else {
             MiscHelper.response(res, result, 200)
           }
@@ -335,7 +334,7 @@ module.exports = {
         kajianModels.findKajianByCat(checkCategory[0].name, latitude, longitude, search)
           .then((result) => {
             if (result[0] === undefined) {
-              MiscHelper.response(res, 'list kajian not found', 404)
+              MiscHelper.response(res, 'list kajian not found', 204)
             } else {
               MiscHelper.response(res, result, 200)
             }

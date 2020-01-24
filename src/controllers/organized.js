@@ -19,7 +19,7 @@ module.exports = {
       const checkUser = await organizedModels.getUser(req.user_id)
 
       if (checkUser[0] === undefined) {
-        MiscHelper.response(res, 'User not found', 404)
+        MiscHelper.response(res, 'User not found', 204)
       } else {
         const data = {
           organized_id: uuidv4(),
@@ -78,7 +78,7 @@ module.exports = {
           MiscHelper.response(res, 'Organized actived', 200)
         })
         .catch(() => {
-          MiscHelper.response(res, 'Bad request', 404)
+          MiscHelper.response(res, 'Bad request', 400)
         })
     }
   },
@@ -94,7 +94,7 @@ module.exports = {
           MiscHelper.response(res, 'Organized has been delete', 200)
         })
         .catch(() => {
-          MiscHelper.response(res, 'Bad Request', 404)
+          MiscHelper.response(res, 'Bad Request', 400)
         })
     }
   }

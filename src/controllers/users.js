@@ -2,7 +2,6 @@ const userModels = require('../models/users')
 const MiscHelper = require('../helpers/helpers')
 const nodemailer = require('nodemailer')
 const uuidv4 = require('uuid/v4')
-const domain = require('../configs/global_config/config')
 const dateFormat = require('dateformat')
 const cloudinary = require('cloudinary')
 const jwt = require('jsonwebtoken')
@@ -31,7 +30,7 @@ module.exports = {
       .then(resultUser => {
         const result = resultUser[0]
         if (resultUser[0] === undefined) {
-          MiscHelper.response(res, 'user not found', 404)
+          MiscHelper.response(res, 'user not found', 204)
         } else {
           MiscHelper.response(res, result, 200)
         }
@@ -44,6 +43,17 @@ module.exports = {
 
   register: async (req, res) => {
     const checkEmail = await userModels.getByEmail(req.body.email)
+
+    function makeid (length) {
+      var result = ''
+      var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+      var charactersLength = characters.length
+      for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength))
+      }
+      return result
+    }
+
     if (checkEmail[0] === undefined) {
       const salt = MiscHelper.generateSalt(64)
       const passwordHash = MiscHelper.setPassword(req.body.password, salt)
@@ -60,13 +70,15 @@ module.exports = {
         updated_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
         role_id: 1,
         verified: false,
-        isOrganized: false
+        isOrganized: false,
+        activation_code: makeid(5)
       }
 
       userModels
         .register(data)
         .then(async () => {
           const result = await userModels.getByEmail(req.body.email)
+          console.log('Hello res ' + JSON.stringify(result))
           const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -74,7 +86,6 @@ module.exports = {
               pass: 'hijrahapp1234'
             }
           })
-          const body = await `${domain.baseUrl}/api/v1/user/activation?email=${req.body.email}`
           const mailOptions = {
             from: 'helpdesk.hijrahapp@gmail.com',
             to: req.body.email,
@@ -82,13 +93,12 @@ module.exports = {
             html:
               'Hello, ' +
               req.body.name +
-              '<br> Please Click on the link to verify your email.<br><a href=' +
-              body +
-              '>Click here to verify</a>'
+              `<br> Please Insert Code HERE..<br>
+              ${result[0].activation_code} `
           }
           transporter.sendMail(mailOptions, function (err, info) {
             if (err) {
-              console.log(err)
+              console.log('Error send email ' + err)
             } else {
               console.log('Sukses Send email')
             }
@@ -114,7 +124,7 @@ module.exports = {
             token: dataUser.token,
             activation: dataUser.activation
           }
-          return MiscHelper.response(res, 'Email inserted', 200, data)
+          return MiscHelper.response(res, data, 200, 'Email inserted')
         })
         .catch(error => {
           console.log(error)
@@ -130,7 +140,7 @@ module.exports = {
     const checkEmail = await userModels.getByEmail(req.body.email)
 
     if (checkEmail[0] === undefined) {
-      MiscHelper.response(res, 'User not found', 404)
+      MiscHelper.response(res, 'User not found', 204)
     } else {
       userModels
         .getByEmail(email)
@@ -168,6 +178,8 @@ module.exports = {
 
   activationUser: (req, res) => {
     const email = req.query.email
+    const code = req.query.code
+
     userModels
       .getByEmail(email)
       .then(result => {
@@ -179,7 +191,7 @@ module.exports = {
             MiscHelper.response(res, 'User already actived', 201)
           } else {
             userModels
-              .activationUser(email)
+              .activationUser(code, email)
               .then(() => {
                 MiscHelper.response(res, 'User has been actived', 200)
               })
@@ -190,7 +202,7 @@ module.exports = {
         }
       })
       .catch(error => {
-        console.log('inih' + error)
+        console.log('errornya' + error)
         MiscHelper.response(res, 'User not found', 404)
       })
   },
@@ -218,7 +230,7 @@ module.exports = {
       return dataCloudinary
     }
     if (checkUser[0] === undefined) {
-      MiscHelper.response(res, 'User not found', 404)
+      MiscHelper.response(res, 'User not found', 204)
     } else {
       const data = {
         name: req.body.name,
@@ -240,7 +252,7 @@ module.exports = {
   forgetPassword: async (req, res) => {
     const checkEmail = await userModels.getByEmail(req.body.email)
     if (checkEmail[0] === undefined) {
-      MiscHelper.response(res, 'User not found', 404)
+      MiscHelper.response(res, 'User not found', 204)
     } else {
       const salt = MiscHelper.generateSalt(64)
       const passwordHash = MiscHelper.setPassword(req.body.password, salt)
