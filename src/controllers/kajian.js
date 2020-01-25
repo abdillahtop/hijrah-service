@@ -383,14 +383,14 @@ module.exports = {
   },
 
   detailKajian: async (req, res) => {
-    const checkKajian = await kajianModels.checkKajian(req.body.kajianId)
+    const checkKajian = await kajianModels.checkKajian(req.query.kajianId)
     const kajian = checkKajian[0]
     if (kajian === undefined) {
       MiscHelper.response(res, 'Kajian not found', 404)
     } else {
       const checkOrganized = await organizedModels.checkOrganized(checkKajian[0].adminKajianId)
-      const memberKajian = await kajianModels.memberKajian(req.body.kajianId)
-      const listUstadz = await ustadzModels.getUstadzByKajian(req.body.kajianId)
+      const memberKajian = await kajianModels.memberKajian(req.query.kajianId)
+      const listUstadz = await ustadzModels.getUstadzByKajian(req.query.kajianId)
       if (checkOrganized[0] === undefined) {
         MiscHelper.response(res, 'Organized not found', 404)
       } else {
