@@ -17,6 +17,8 @@ module.exports = {
 
         req.user_id = decoded.user_id
 
+        req.roleId = decoded.role_id
+
         next()
       })
     } else {

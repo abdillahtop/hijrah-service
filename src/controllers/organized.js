@@ -2,6 +2,7 @@ const organizedModels = require('../models/organized')
 const MiscHelper = require('../helpers/helpers')
 const uuidv4 = require('uuid/v4')
 const dateFormat = require('dateformat')
+const nodemailer = require('nodemailer')
 // const validate = require('validate.js')
 
 module.exports = {
@@ -68,34 +69,64 @@ module.exports = {
   },
 
   activeOrganized: async (req, res) => {
-    const checkOrganized = await organizedModels.checkOrganized(req.query.organizedId)
+    console.log(req.roleId)
+    if (req.roleId === 4) {
+      const OrganizedDetail = await organizedModels.checkOrganized(req.query.organizedId)
 
-    if (checkOrganized[0] === undefined) {
-      MiscHelper.response(res, 'Organized not found', 401)
+      if (OrganizedDetail[0] === undefined) {
+        MiscHelper.response(res, 'Organized not found', 401)
+      } else {
+        organizedModels.activationOrganized(req.query.organizedId)
+          .then(() => {
+            const transporter = nodemailer.createTransport({
+              service: 'gmail',
+              auth: {
+                user: 'helpdesk.hijrahapp@gmail.com',
+                pass: 'hijrahapp1234'
+              }
+            })
+            const mailOptions = {
+              from: 'helpdesk.hijrahapp@gmail.com',
+              to: OrganizedDetail[0].email,
+              subject: 'Palapaone',
+              html:
+                'Hello, ' + OrganizedDetail[0].name_organized +
+                '<br>Selamat akun penyelenggara anda telah veritifikasi, yuk posting acara kajian anda di Aplikasi hijrah...<br>'
+            }
+            transporter.sendMail(mailOptions, function (err, info) {
+              if (err) {
+                console.log('Error send email ' + err)
+              } else {
+                console.log('Sukses Send email')
+              }
+            })
+            MiscHelper.response(res, 'Organized actived', 200)
+          })
+          .catch(() => {
+            MiscHelper.response(res, 'Bad request', 400)
+          })
+      }
     } else {
-      organizedModels.activationOrganized(req.query.organizedId)
-        .then(() => {
-          MiscHelper.response(res, 'Organized actived', 200)
-        })
-        .catch(() => {
-          MiscHelper.response(res, 'Bad request', 400)
-        })
+      MiscHelper.response(res, 'Your role not allowed', 201)
     }
   },
 
   deleteOrganized: async (req, res) => {
-    const checkOrganized = await organizedModels.checkOrganized(req.params.organizedId)
+    if (req.roleId === 4) {
+      const checkOrganized = await organizedModels.checkOrganized(req.params.organizedId)
 
-    if (checkOrganized[0] === undefined) {
-      MiscHelper.response(res, 'Organized not found', 401)
-    } else {
-      organizedModels.deleteOrganized(req.params.organizedId, checkOrganized[0].user_id)
-        .then(() => {
-          MiscHelper.response(res, 'Organized has been delete', 200)
-        })
-        .catch(() => {
-          MiscHelper.response(res, 'Bad Request', 400)
-        })
+      if (checkOrganized[0] === undefined) {
+        MiscHelper.response(res, 'Organized not found', 401)
+      } else {
+        organizedModels.deleteOrganized(req.params.organizedId, checkOrganized[0].user_id)
+          .then(() => {
+            MiscHelper.response(res, 'Organized has been delete', 200)
+          })
+          .catch(() => {
+            MiscHelper.response(res, 'Bad Request', 400)
+          })
+      }
     }
+    MiscHelper.response(res, 'Your role noot allowed', 400)
   }
 }

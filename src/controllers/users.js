@@ -44,15 +44,15 @@ module.exports = {
   register: async (req, res) => {
     const checkEmail = await userModels.getByEmail(req.body.email)
 
-    function makeid (length) {
-      var result = ''
-      var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-      var charactersLength = characters.length
-      for (var i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength))
-      }
-      return result
-    }
+    // function makeid (length) {
+    //   var result = ''
+    //   var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    //   var charactersLength = characters.length
+    //   for (var i = 0; i < length; i++) {
+    //     result += characters.charAt(Math.floor(Math.random() * charactersLength))
+    //   }
+    //   return result
+    // }
 
     if (checkEmail[0] === undefined) {
       const salt = MiscHelper.generateSalt(64)
@@ -71,39 +71,13 @@ module.exports = {
         role_id: 1,
         verified: false,
         isOrganized: false,
-        activation_code: makeid(5)
+        activation_code: ''
       }
 
       userModels
         .register(data)
         .then(async () => {
           const result = await userModels.getByEmail(req.body.email)
-          console.log('Hello res ' + JSON.stringify(result))
-          const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-              user: 'helpdesk.hijrahapp@gmail.com',
-              pass: 'hijrahapp1234'
-            }
-          })
-          const mailOptions = {
-            from: 'helpdesk.hijrahapp@gmail.com',
-            to: req.body.email,
-            subject: 'Verify Akun',
-            html:
-              'Hello, ' +
-              req.body.name +
-              `<br> Please Insert Code HERE..<br>
-              ${result[0].activation_code} `
-          }
-          transporter.sendMail(mailOptions, function (err, info) {
-            if (err) {
-              console.log('Error send email ' + err)
-            } else {
-              console.log('Sukses Send email')
-            }
-          })
-
           const dataUser = result[0]
           const usePassword = MiscHelper.setPassword(req.body.password, dataUser.salt)
             .passwordHash
@@ -111,6 +85,64 @@ module.exports = {
             dataUser.token = jwt.sign(
               {
                 user_id: dataUser.user_id
+              },
+              process.env.SECRET_KEY,
+              { expiresIn: '1000h' }
+            )
+
+            delete dataUser.salt
+            delete dataUser.password
+          }
+          userModels.updateToken(dataUser.token, dataUser.email)
+          const data = {
+            token: dataUser.token,
+            activation: dataUser.activation
+          }
+          return MiscHelper.response(res, data, 200, 'Email inserted')
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    } else {
+      MiscHelper.response(res, 'Email has been used', 401)
+    }
+  },
+
+  registerAdmin: async (req, res) => {
+    const checkEmail = await userModels.getByEmail(req.body.email)
+
+    if (checkEmail[0] === undefined) {
+      const salt = MiscHelper.generateSalt(64)
+      const passwordHash = MiscHelper.setPassword(req.body.password, salt)
+
+      const data = {
+        user_id: uuidv4(),
+        email: req.body.email,
+        name: 'ADMIN HIJRAH',
+        password: passwordHash.passwordHash,
+        salt: passwordHash.salt,
+        profile_url: config.defaultProfile,
+        activation: 1,
+        created_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
+        updated_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
+        role_id: 4,
+        verified: true,
+        isOrganized: false,
+        activation_code: ''
+      }
+
+      userModels
+        .register(data)
+        .then(async () => {
+          const result = await userModels.getByEmail(req.body.email)
+          const dataUser = result[0]
+          const usePassword = MiscHelper.setPassword(req.body.password, dataUser.salt)
+            .passwordHash
+          if (usePassword === dataUser.password) {
+            dataUser.token = jwt.sign(
+              {
+                user_id: dataUser.user_id,
+                role_id: dataUser.role_id
               },
               process.env.SECRET_KEY,
               { expiresIn: '1000h' }
@@ -151,7 +183,8 @@ module.exports = {
           if (usePassword === dataUser.password) {
             dataUser.token = jwt.sign(
               {
-                user_id: dataUser.user_id
+                user_id: dataUser.user_id,
+                role_id: dataUser.role_id
               },
               process.env.SECRET_KEY,
               { expiresIn: '1000h' }
@@ -176,14 +209,14 @@ module.exports = {
     }
   },
 
-  activationUser: (req, res) => {
-    const email = req.query.email
+  activationUser: async (req, res) => {
+    const checkUser = await userModels.userDetail(req.user_id)
     const code = req.query.code
 
     userModels
-      .getByEmail(email)
+      .getByEmail(checkUser[0].email)
       .then(result => {
-        if (validate.isEmpty(email)) {
+        if (validate.isEmpty(checkUser[0].email)) {
           MiscHelper.response(res, 'need token!', 401)
         } else {
           const dataUser = result[0]
@@ -191,7 +224,7 @@ module.exports = {
             MiscHelper.response(res, 'User already actived', 201)
           } else {
             userModels
-              .activationUser(code, email)
+              .activationUser(code, checkUser[0].email)
               .then(() => {
                 MiscHelper.response(res, 'User has been actived', 200)
               })
@@ -200,6 +233,54 @@ module.exports = {
               })
           }
         }
+      })
+      .catch(error => {
+        console.log('errornya' + error)
+        MiscHelper.response(res, 'User not found', 404)
+      })
+  },
+
+  sendCode: async (req, res) => {
+    function makeid (length) {
+      var result = ''
+      var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+      var charactersLength = characters.length
+      for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength))
+      }
+      return result
+    }
+
+    userModels
+      .sendCode(makeid(5), req.query.email)
+      .then(async () => {
+        const result = await userModels.getByEmail(req.query.email)
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: 'helpdesk.hijrahapp@gmail.com',
+            pass: 'hijrahapp1234'
+          }
+        })
+        const mailOptions = {
+          from: 'helpdesk.hijrahapp@gmail.com',
+          to: req.query.email,
+          subject: 'Verify Akun',
+          html:
+            'Hello, ' + result[0].name +
+            `<br> Please Insert Code HERE..<br>
+            ${result[0].activation_code} `
+        }
+
+        transporter.sendMail(mailOptions, function (err, info) {
+          if (err) {
+            MiscHelper.response(res, 'Bad Request', 400)
+            console.log('Error send email ' + err)
+          } else {
+            MiscHelper.response(res, 'Sukses Send email', 200)
+            console.log('Sukses Send email')
+          }
+        })
       })
       .catch(error => {
         console.log('errornya' + error)
@@ -244,6 +325,26 @@ module.exports = {
           MiscHelper.response(res, 'Data has been updated', 200)
         })
         .catch(() => {
+          MiscHelper.response(res, 'Bad request', 400)
+        })
+    }
+  },
+
+  validateCode: async (req, res) => {
+    const userDetail = await userModels.getByEmail(req.query.email)
+    const code = req.query.code
+    if (userDetail[0] === undefined) {
+      MiscHelper.response(res, 'User not found', 204)
+    } else {
+      userModels.validateCode(code, req.query.email)
+        .then(() => {
+          const data = {
+            email: req.query.email
+          }
+          MiscHelper.response(res, data, 200, 'Code match')
+        })
+        .catch((err) => {
+          console.log('error ' + err)
           MiscHelper.response(res, 'Bad request', 400)
         })
     }

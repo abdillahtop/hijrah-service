@@ -33,6 +33,18 @@ module.exports = {
     })
   },
 
+  getUser: (userId) => {
+    return new Promise((resolve, reject) => {
+      connection.query('SELECT * FROM users WHERE user_id = ?', userId, async (err, result) => {
+        if (!err) {
+          await resolve(result)
+        } else {
+          await reject(new Error(err))
+        }
+      })
+    })
+  },
+
   getByEmail: (email) => {
     return new Promise((resolve, reject) => {
       connection.query('SELECT * FROM users WHERE email = ?', email, async (err, result) => {
@@ -69,6 +81,30 @@ module.exports = {
     })
   },
 
+  sendCode: (code, email) => {
+    return new Promise((resolve, reject) => {
+      connection.query('UPDATE users SET activation_code = ? WHERE email = ?', [code, email], (err, result) => {
+        if (!err) {
+          resolve(result)
+        } else {
+          reject(new Error(err))
+        }
+      })
+    })
+  },
+
+  validateCode: (code, email) => {
+    return new Promise((resolve, reject) => {
+      connection.query('SELECT * FROM users WHERE activation_code = ? AND email = ?', [code, email], (err, result) => {
+        if (!err) {
+          resolve(result)
+        } else {
+          reject(new Error(err))
+        }
+      })
+    })
+  },
+
   updateProfile: (data, userId) => {
     return new Promise((resolve, reject) => {
       connection.query('UPDATE users SET ? WHERE user_id = ?', [data, userId], (err, result) => {
@@ -81,9 +117,9 @@ module.exports = {
     })
   },
 
-  forgetPassword: (data, email) => {
+  forgetPassword: (data, email, code) => {
     return new Promise((resolve, reject) => {
-      connection.query('UPDATE users SET ? WHERE email = ?', [data, email], (err, result) => {
+      connection.query('UPDATE users SET ? WHERE email = ? AND activation_code = ?', [data, email, code], (err, result) => {
         if (!err) {
           resolve(result)
         } else {

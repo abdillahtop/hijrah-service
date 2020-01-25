@@ -1,7 +1,7 @@
 const express = require('express')
 const Route = express.Router()
 const multer = require('multer')
-const sending = require('../helpers/nodemailer')
+// const sending = require('../helpers/nodemailer')
 const UserController = require('../controllers/users')
 const Auth = require('../helpers/auth')
 
@@ -18,9 +18,12 @@ const upload = multer({ storage: storage })
 Route
   .get('/', UserController.getIndex)
   .get('/userDetail', Auth.accesstoken, UserController.userDetail)
-  .post('/activation', UserController.activationUser)
-  .post('/register', UserController.register, sending)
+  .get('/verify', UserController.validateCode)
+  .post('/activation', Auth.accesstoken, UserController.activationUser)
+  .post('/register', UserController.register)
+  .post('/register-admin', UserController.registerAdmin)
   .post('/forget-password', UserController.forgetPassword)
+  .post('/send-code', UserController.sendCode)
   .post('/login', UserController.login)
   .patch('/update-profile', upload.single('image'), Auth.accesstoken, UserController.updateProfile)
 module.exports = Route
