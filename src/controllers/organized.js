@@ -111,6 +111,28 @@ module.exports = {
     }
   },
 
+  listOrganized: async (req, res) => {
+    if (req.roleId === 4) {
+      const limit = await parseInt(req.query.limit)
+      const page = await parseInt(req.query.page)
+      organizedModels.listOrganized(limit, page)
+        .then((result) => {
+          if (result[0] === '') {
+            MiscHelper.response(res, 'Not found member', 204)
+          } else {
+            MiscHelper.resPagination(
+              res,
+              result[0],
+              200,
+              result[1],
+              result[2],
+              result[3]
+            )
+          }
+        })
+    }
+  },
+
   deleteOrganized: async (req, res) => {
     if (req.roleId === 4) {
       const checkOrganized = await organizedModels.checkOrganized(req.params.organizedId)

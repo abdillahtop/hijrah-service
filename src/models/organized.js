@@ -38,6 +38,27 @@ module.exports = {
     })
   },
 
+  listOrganized: (limit, page) => {
+    const offset = (limit * page) - limit
+    return new Promise((resolve, reject) => {
+      connection.query('SELECT count(*) as total FROM organized', async (err, result) => {
+        if (!err) {
+          const totalData = result[0].total
+          const totalPage = Math.ceil(totalData / limit)
+          await connection.query('SELECT organized_id, user_id, name_organized, email, profile_url,phone_number, address, management, created_at, activation FROM organized ORDER BY created_at desc LIMIT ? OFFSET ?', [limit, offset], (err2, results) => {
+            if (!err2) {
+              resolve([results, totalData, page, totalPage])
+            } else {
+              reject(new Error(err2))
+            }
+          })
+        } else {
+          reject(new Error(err))
+        }
+      })
+    })
+  },
+
   getUser: (userId) => {
     return new Promise((resolve, reject) => {
       connection.query('SELECT * FROM users WHERE user_id = ?', userId, async (err, result) => {
