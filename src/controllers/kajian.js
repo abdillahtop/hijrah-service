@@ -307,6 +307,33 @@ module.exports = {
       })
   },
 
+  getKajianbyOrganized: async (req, res) => {
+    const limit = await parseInt(req.query.limit)
+    const page = await parseInt(req.query.page)
+    const dateNow = new Date()
+    const checkOrganized = await organizedModels.getOrganizer(
+      req.user_id
+    )
+    kajianModels
+      .getKajinbyOrganized(dateNow, checkOrganized[0].organized_id, limit, page)
+      .then(result => {
+        if (result === '') {
+          MiscHelper.resPagination(res, 'Kajian not found', 204)
+        } else {
+          MiscHelper.resPagination(res,
+            result[0],
+            200,
+            result[1],
+            result[2],
+            result[3])
+        }
+      })
+      .catch(error => {
+        MiscHelper.response(res, 'Bad Request', 400)
+        console.log('errornya ' + error)
+      })
+  },
+
   findKajian: async (req, res) => {
     const catId = await req.query.catId
     const search = await req.query.search
@@ -368,17 +395,34 @@ module.exports = {
   },
 
   deleteKajian: async (req, res) => {
-    const checkKajian = await kajianModels.checkKajianbyUserId(req.user_id)
-    if (checkKajian[0] === undefined) {
-      MiscHelper.response(res, 'Kajian not found', 404)
+    const checkOrganized = await organizedModels.getOrganizer(
+      req.user_id
+    )
+    if (checkOrganized[0] === undefined) {
+      MiscHelper.response(res, 'Your Organized not registered', 404)
     } else {
-      kajianModels.deleteKajian(req.user_id, checkKajian[0].kajian_id)
-        .then(() => {
-          MiscHelper.response(res, 'Kajian has been delete', 200)
+      const checkKajian = await kajianModels.checkKajianbyUserId(checkOrganized[0].organized_id)
+      if (checkKajian[0] === undefined) {
+        MiscHelper.response(res, 'Kajian not found', 404)
+      } else {
+        let status = true
+        checkKajian.map(async (value, index) => {
+          if (value.kajian_id === req.params.kajianId) {
+            status = false
+            await kajianModels.deleteKajian(value.adminKajianId, req.params.kajianId)
+              .then(() => {
+                MiscHelper.response(res, 'Kajian has been delete', 200)
+              })
+              .catch(() => {
+                MiscHelper.response(res, 'Bad Request', 400)
+              })
+          }
         })
-        .catch(() => {
-          MiscHelper.response(res, 'Bad Request', 400)
-        })
+        console.log(status)
+        if (status) {
+          MiscHelper.response(res, 'Comment not found', 202)
+        }
+      }
     }
   },
 
