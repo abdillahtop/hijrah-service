@@ -129,7 +129,6 @@ module.exports = {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
     const dateNow = new Date()
-    console.log(dateNow)
     kajianModels
       .getKajianAll(dateNow, limit, page)
       .then(result => {
@@ -427,14 +426,14 @@ module.exports = {
   },
 
   detailKajian: async (req, res) => {
-    const checkKajian = await kajianModels.checkKajian(req.query.kajianId)
+    const checkKajian = await kajianModels.checkKajian(req.params.kajianId)
     const kajian = checkKajian[0]
     if (kajian === undefined) {
       MiscHelper.response(res, 'Kajian not found', 404)
     } else {
       const checkOrganized = await organizedModels.checkOrganized(checkKajian[0].adminKajianId)
-      const memberKajian = await kajianModels.memberKajian(req.query.kajianId)
-      const listUstadz = await ustadzModels.getUstadzByKajian(req.query.kajianId)
+      const memberKajian = await kajianModels.memberKajian(req.params.kajianId)
+      const listUstadz = await ustadzModels.getUstadzByKajian(req.params.kajianId)
       if (checkOrganized[0] === undefined) {
         MiscHelper.response(res, 'Organized not found', 404)
       } else {
