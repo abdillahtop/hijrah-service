@@ -433,6 +433,9 @@ module.exports = {
     if (checkCategory[0] === undefined) {
       MiscHelper.response(res, 'Category not found', 404)
     }
+    if (checkOrganized[0] === undefined) {
+      MiscHelper.response(res, 'Organized not found', 404)
+    }
 
     kajianModels
       .getKajinbyOrganized(dateNow, checkOrganized[0].organized_id, active, checkCategory[0].name, limit, page)
