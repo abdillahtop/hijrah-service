@@ -52,79 +52,41 @@ module.exports = {
     } else if (checkOrganized[0].activation === '0') {
       MiscHelper.response(res, 'Activation Organized first', 401)
     } else {
-      if (req.body.categoryId == 3) {
-        const date = dateFormat(req.body.endDate, 'yyyy-mm-dd')
-        const data = {
-          kajian_id: uuidv4(),
-          adminKajianId: checkOrganized[0].organized_id,
-          adminKajianName: req.body.adminNameKajian,
-          categoryName: checkCategory[0].name,
-          location: req.body.location,
-          startDate: req.body.startDate,
-          endDate: req.body.endDate,
-          endDateFormat: date + 'T' + req.body.timeEnd,
-          timeStart: req.body.timeStart,
-          timeEnd: req.body.timeEnd,
-          description: req.body.description,
-          title: req.body.title,
-          linkVideo: req.body.linkVideo,
-          kajianPhoneNumber: req.body.phoneNumber,
-          latitude: parseFloat(req.body.latitude),
-          longitude: parseFloat(req.body.longitude),
-          locationMap: req.body.locationMap,
-          publishAt: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
-          active: true,
-          isUstadz: 1,
-          image: await geturl(),
-          count_member: 0,
-          payment: req.body.payment
-        }
-        kajianModels
-          .addKajian(data)
-          .then(() => {
-            MiscHelper.response(res, 'Kajian has been Insert', 200)
-          })
-          .catch(error => {
-            MiscHelper.response(res, 'Bad request', 400)
-            console.log('erronya ' + error)
-          })
-      } else {
-        const date = dateFormat(req.body.endDate, 'yyyy-mm-dd')
-        const data = {
-          kajian_id: uuidv4(),
-          adminKajianId: checkOrganized[0].organized_id,
-          adminKajianName: req.body.adminNameKajian,
-          categoryName: checkCategory[0].name,
-          location: req.body.location,
-          startDate: req.body.startDate,
-          endDate: req.body.endDate,
-          endDateFormat: date + 'T' + req.body.timeEnd,
-          timeStart: req.body.timeStart,
-          timeEnd: req.body.timeEnd,
-          description: req.body.description,
-          title: req.body.title,
-          linkVideo: req.body.linkVideo,
-          kajianPhoneNumber: req.body.phoneNumber,
-          latitude: parseFloat(req.body.latitude),
-          longitude: parseFloat(req.body.longitude),
-          locationMap: req.body.locationMap,
-          publishAt: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
-          active: true,
-          isUstadz: false,
-          image: await geturl(),
-          count_member: 0,
-          payment: req.body.payment
-        }
-        kajianModels
-          .addKajian(data)
-          .then(() => {
-            MiscHelper.response(res, data.kajian_id, 200, 'Kajian has been Insert')
-          })
-          .catch(error => {
-            MiscHelper.response(res, 'Bad request', 400)
-            console.log('erronya ' + error)
-          })
+      const date = dateFormat(req.body.endDate, 'yyyy-mm-dd')
+      const data = {
+        kajian_id: uuidv4(),
+        adminKajianId: checkOrganized[0].organized_id,
+        adminKajianName: req.body.adminNameKajian,
+        categoryName: checkCategory[0].name,
+        location: req.body.location,
+        startDate: req.body.startDate,
+        endDate: req.body.endDate,
+        endDateFormat: date + 'T' + req.body.timeEnd,
+        timeStart: req.body.timeStart,
+        timeEnd: req.body.timeEnd,
+        description: req.body.description,
+        title: req.body.title,
+        linkVideo: req.body.linkVideo,
+        kajianPhoneNumber: req.body.phoneNumber,
+        latitude: parseFloat(req.body.latitude),
+        longitude: parseFloat(req.body.longitude),
+        locationMap: req.body.locationMap,
+        publishAt: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
+        active: true,
+        isUstadz: false,
+        image: await geturl(),
+        count_member: 0,
+        payment: req.body.payment
       }
+      kajianModels
+        .addKajian(data)
+        .then(() => {
+          MiscHelper.response(res, data.kajian_id, 200, 'Kajian has been Insert')
+        })
+        .catch(error => {
+          MiscHelper.response(res, 'Bad request', 400)
+          console.log('erronya ' + error)
+        })
     }
   },
 
@@ -404,9 +366,8 @@ module.exports = {
   },
 
   getKajianbyUser: async (req, res) => {
-    const active = await req.query.active
     kajianModels
-      .getKajianByUser(req.user_id, active)
+      .getKajianByUser(req.user_id)
       .then(result => {
         if (result === '') {
           MiscHelper.resPagination(res, 'Kajian not found', 204)

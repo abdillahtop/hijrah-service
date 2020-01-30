@@ -254,9 +254,9 @@ module.exports = {
     })
   },
 
-  getKajianByUser: (userId, active) => {
+  getKajianByUser: (userId) => {
     return new Promise((resolve, reject) => {
-      connection.query('SELECT kajian.kajian_id, kajian.title, kajian.image, kajian.categoryName, kajian.startDate, kajian.endDate, kajian.timeStart, kajian.timeEnd, kajian.location, kajian.payment FROM kajian JOIN member_kajian ON kajian.kajian_id = member_kajian.kajian_id WHERE member_kajian.user_id = ? AND kajian.active = ?', [userId, active], async (err, result) => {
+      connection.query('SELECT kajian.kajian_id, kajian.title, kajian.image, kajian.categoryName, kajian.startDate, kajian.endDate, kajian.timeStart, kajian.timeEnd, kajian.location, kajian.payment FROM kajian JOIN member_kajian ON kajian.kajian_id = member_kajian.kajian_id WHERE member_kajian.user_id = ?', userId, async (err, result) => {
         if (!err) {
           await resolve(result)
         } else {

@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
 const MiscHelper = require('../helpers/helpers')
+const userModel = require('../models/users')
 
 const allowedAccess = process.env.REQUEST_HEADERS
 
@@ -9,6 +10,25 @@ module.exports = {
     const headerSecret = req.headers['x-access-token']
 
     if (headerAuth !== allowedAccess) {
+      return MiscHelper.response(res, null, 401, 'Unauthorized, Need Authentication!')
+    } else if (typeof headerSecret === 'undefined') {
+      console.log('Authentication Valid!')
+      next()
+    } else {
+      const bearerToken = headerSecret.split(' ')
+      const token = bearerToken[1]
+      req.token = token
+      console.log('Token stored!')
+      next()
+    }
+  },
+
+  authCode: async (req, res, next) => {
+    const userDetail = userModel.getByEmail(req.body.email)
+    const headerAuth = req.headers.authorization
+    const headerSecret = req.headers['x-access-token']
+    const hello = await userDetail
+    if (headerAuth !== hello[0].activation_code) {
       return MiscHelper.response(res, null, 401, 'Unauthorized, Need Authentication!')
     } else if (typeof headerSecret === 'undefined') {
       console.log('Authentication Valid!')

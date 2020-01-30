@@ -23,7 +23,7 @@ Route
   .post('/register', UserController.register)
   .post('/register-admin', Auth.authInfo, UserController.registerAdmin)
   .post('/register-gmail', UserController.registerbyGmail)
-  .post('/forget-password', UserController.forgetPassword)
+  .post('/forget-password', Auth.authCode, UserController.forgetPassword)
   .post('/send-code', UserController.sendCode)
   .post('/login', UserController.login)
   .patch('/update-profile', upload.single('image'), Auth.accesstoken, UserController.updateProfile)
