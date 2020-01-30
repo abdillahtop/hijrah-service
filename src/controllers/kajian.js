@@ -117,7 +117,6 @@ module.exports = {
     const checkCategory = await categoryModels.checkCategory(req.body.categoryId)
 
     const checkKajian = await kajianModels.checkKajian(req.params.kajianId)
-    console.log(JSON.stringify(checkOrganized))
     if (checkCategory[0] === undefined) {
       MiscHelper.response(res, 'Category not found', 404)
       next()
