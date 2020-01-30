@@ -119,7 +119,7 @@ module.exports = {
 
   forgetPassword: (data, email, code) => {
     return new Promise((resolve, reject) => {
-      connection.query('UPDATE users SET ? WHERE email = ? AND activation_code = ?', [data, email, code], (err, result) => {
+      connection.query('UPDATE users SET ? WHERE email = ?', [data, email], (err, result) => {
         if (!err) {
           resolve(result)
         } else {
