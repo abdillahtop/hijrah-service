@@ -76,7 +76,8 @@ module.exports = {
           active: true,
           isUstadz: true,
           image: await geturl(),
-          count_member: 0
+          count_member: 0,
+          payment: req.body.payment
         }
         kajianModels
           .addKajian(data)
@@ -111,7 +112,8 @@ module.exports = {
           active: true,
           isUstadz: false,
           image: await geturl(),
-          count_member: 0
+          count_member: 0,
+          payment: req.body.payment
         }
         kajianModels
           .addKajian(data)
