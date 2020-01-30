@@ -52,7 +52,7 @@ module.exports = {
     } else if (checkOrganized[0].activation === '0') {
       MiscHelper.response(res, 'Activation Organized first', 401)
     } else {
-      if (req.body.categoryId === 3) {
+      if (req.body.categoryId == 3) {
         const date = dateFormat(req.body.endDate, 'yyyy-mm-dd')
         const data = {
           kajian_id: uuidv4(),
@@ -74,7 +74,7 @@ module.exports = {
           locationMap: req.body.locationMap,
           publishAt: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
           active: true,
-          isUstadz: true,
+          isUstadz: 1,
           image: await geturl(),
           count_member: 0,
           payment: req.body.payment
