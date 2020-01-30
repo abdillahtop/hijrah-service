@@ -27,7 +27,9 @@ Route
   .get('/detail-kajian/:kajianId', KajianController.detailKajian)
   .post('/add-kajian', upload.single('image'), Auth.accesstoken, KajianController.addKajian)
   .post('/add-member-kajian', Auth.accesstoken, KajianController.addMemberKajian)
+  .patch('/update-kajian/:kajianId', upload.single('image'), Auth.accesstoken, KajianController.editKajian)
   .delete('/unjoin-kajian', Auth.accesstoken, KajianController.unjoinKajian)
   .delete('/:kajianId', Auth.accesstoken, KajianController.deleteKajian)
+  .delete('/kajian-user/:kajianId', Auth.accesstoken, KajianController.deleteKajianUser)
 
 module.exports = Route

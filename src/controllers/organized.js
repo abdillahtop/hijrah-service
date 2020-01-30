@@ -69,7 +69,6 @@ module.exports = {
   },
 
   activeOrganized: async (req, res) => {
-    console.log(req.roleId)
     if (req.roleId === 4) {
       const OrganizedDetail = await organizedModels.checkOrganized(req.query.organizedId)
 

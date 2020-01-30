@@ -44,16 +44,6 @@ module.exports = {
   register: async (req, res) => {
     const checkEmail = await userModels.getByEmail(req.body.email)
 
-    // function makeid (length) {
-    //   var result = ''
-    //   var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-    //   var charactersLength = characters.length
-    //   for (var i = 0; i < length; i++) {
-    //     result += characters.charAt(Math.floor(Math.random() * charactersLength))
-    //   }
-    //   return result
-    // }
-
     if (checkEmail[0] === undefined) {
       const salt = MiscHelper.generateSalt(64)
       const passwordHash = MiscHelper.setPassword(req.body.password, salt)
@@ -166,6 +156,63 @@ module.exports = {
     }
   },
 
+  registerbyGmail: async (req, res) => {
+    const checkEmail = await userModels.getByEmail(req.body.email)
+
+    if (checkEmail[0] === undefined) {
+      const salt = MiscHelper.generateSalt(64)
+      const passwordHash = MiscHelper.setPassword('sobatHijrah', salt)
+
+      const data = {
+        user_id: uuidv4(),
+        email: req.body.email,
+        name: req.body.name,
+        password: passwordHash.passwordHash,
+        salt: passwordHash.salt,
+        profile_url: req.body.photoProfile,
+        activation: 1,
+        created_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
+        updated_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
+        role_id: 1,
+        verified: false,
+        isOrganized: false,
+        activation_code: ''
+      }
+
+      userModels
+        .register(data)
+        .then(async () => {
+          const result = await userModels.getByEmail(req.body.email)
+          const dataUser = result[0]
+          const usePassword = MiscHelper.setPassword('sobatHijrah', dataUser.salt)
+            .passwordHash
+          if (usePassword === dataUser.password) {
+            dataUser.token = jwt.sign(
+              {
+                user_id: dataUser.user_id,
+                role_id: dataUser.role_id
+              },
+              process.env.SECRET_KEY,
+              { expiresIn: '1000h' }
+            )
+
+            delete dataUser.salt
+            delete dataUser.password
+          }
+          userModels.updateToken(dataUser.token, dataUser.email)
+          const data = {
+            token: dataUser.token
+          }
+          return MiscHelper.response(res, data, 200, 'Email inserted')
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    } else {
+      MiscHelper.response(res, 'Email has been used', 401)
+    }
+  },
+
   login: async (req, res) => {
     const email = req.body.email
     const password = req.body.password
@@ -243,7 +290,7 @@ module.exports = {
   sendCode: async (req, res) => {
     function makeid (length) {
       var result = ''
-      var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+      var characters = '0123456789'
       var charactersLength = characters.length
       for (var i = 0; i < length; i++) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength))
@@ -252,7 +299,7 @@ module.exports = {
     }
 
     userModels
-      .sendCode(makeid(5), req.query.email)
+      .sendCode(makeid(4), req.query.email)
       .then(async () => {
         const result = await userModels.getByEmail(req.query.email)
         const transporter = nodemailer.createTransport({
@@ -337,11 +384,15 @@ module.exports = {
       MiscHelper.response(res, 'User not found', 204)
     } else {
       userModels.validateCode(code, req.query.email)
-        .then(() => {
-          const data = {
-            email: req.query.email
+        .then((result) => {
+          if (validate.isEmpty(result)) {
+            MiscHelper.response(res, '', 400, 'Code not match')
+          } else {
+            const data = {
+              email: req.query.email
+            }
+            MiscHelper.response(res, data, 200, 'Code match')
           }
-          MiscHelper.response(res, data, 200, 'Code match')
         })
         .catch((err) => {
           console.log('error ' + err)

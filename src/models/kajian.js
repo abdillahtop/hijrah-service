@@ -121,9 +121,9 @@ module.exports = {
     })
   },
 
-  updateKajian: (data, eventId) => {
+  updateKajian: (data) => {
     return new Promise((resolve, reject) => {
-      connection.query('UPDATE ? FROM kajian WHERE event_id = ?', [data, eventId], (err, result) => {
+      connection.query('UPDATE ? FROM kajian WHERE kajian_id = ?', [data, data.kajianId], (err, result) => {
         if (!err) {
           resolve(result)
         } else {
@@ -256,7 +256,7 @@ module.exports = {
 
   getKajianByUser: (userId, active) => {
     return new Promise((resolve, reject) => {
-      connection.query('SELECT kajian.title, kajian.categoryName, kajian.startDate, kajian.endDate, timeStart, timeEnd, kajian.location FROM kajian JOIN member_kajian ON kajian.kajian_id = member_kajian.kajian_id WHERE member_kajian.user_id = ? AND kajian.active = ?', [userId, active], async (err, result) => {
+      connection.query('SELECT kajian.kajian_id, kajian.title, kajian.image, kajian.categoryName, kajian.startDate, kajian.endDate, kajian.timeStart, kajian.timeEnd, kajian.location FROM kajian JOIN member_kajian ON kajian.kajian_id = member_kajian.kajian_id WHERE member_kajian.user_id = ? AND kajian.active = ?', [userId, active], async (err, result) => {
         if (!err) {
           await resolve(result)
         } else {
@@ -296,16 +296,28 @@ module.exports = {
     })
   },
 
-  getKajinbyOrganized: (dateNow, organizedId, limit, page) => {
+  deleteKajianbyUser: (regisId) => {
+    return new Promise((resolve, reject) => {
+      connection.query('DELETE FROM member_kajian WHERE registration_id = ?', regisId, async (err, result) => {
+        if (!err) {
+          await resolve(result)
+        } else {
+          await reject(new Error(err))
+        }
+      })
+    })
+  },
+
+  getKajinbyOrganized: (dateNow, organizedId, active, categoryName, limit, page) => {
     const offset = (limit * page) - limit
     return new Promise((resolve, reject) => {
       connection.query('UPDATE kajian SET active = ? WHERE endDate <= ?', [0, dateNow], async (err1, result1) => {
         if (!err1) {
-          await connection.query('SELECT count(*) as total FROM kajian WHERE isUstadz = 1 AND adminKajianId = ?', organizedId, async (err2, result2) => {
+          await connection.query('SELECT count(*) as total FROM kajian WHERE isUstadz = 1 AND categoryName = ? AND adminKajianId = ?', [categoryName, organizedId], async (err2, result2) => {
             if (!err2) {
               const totalData = result2[0].total
               const totalPage = Math.ceil(totalData / limit)
-              await connection.query('SELECT * FROM kajian WHERE isUstadz = 1 AND adminKajianId = ? ORDER BY startDate desc LIMIT ? OFFSET ?', [organizedId, limit, offset], (err3, results) => {
+              await connection.query('SELECT kajian.title,image, kajian.categoryName, kajian.startDate, kajian.endDate, timeStart, timeEnd, kajian.location FROM kajian JOIN organized ON kajian.adminKajianId = organized.organized_id WHERE organized.organized_id = ? AND active = ? AND categoryName = ? AND isUstadz = 1 ORDER BY kajian.startDate desc LIMIT ? OFFSET ?', [organizedId, active, categoryName, limit, offset], (err3, results) => {
                 if (!err3) {
                   resolve([results, totalData, page, totalPage])
                 } else {
