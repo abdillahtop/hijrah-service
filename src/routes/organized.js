@@ -13,6 +13,7 @@ Route
   .get('/list-organized', Auth.accesstoken, OrganizedController.listOrganized)
   .post('/register', Auth.accesstoken, OrganizedController.register)
   .post('/activation-organized', Auth.accesstoken, OrganizedController.activeOrganized, sending)
+  .patch('/update-organized', Auth.accesstoken, OrganizedController.updateOrganized)
   .delete('/:organizedId', Auth.accesstoken, OrganizedController.deleteOrganized)
 
 module.exports = Route

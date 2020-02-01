@@ -121,9 +121,9 @@ module.exports = {
     })
   },
 
-  updateKajian: (data) => {
+  updateKajian: (data, kajianId) => {
     return new Promise((resolve, reject) => {
-      connection.query('UPDATE ? FROM kajian WHERE kajian_id = ?', [data, data.kajianId], (err, result) => {
+      connection.query('UPDATE kajian SET ? WHERE kajian_id = ?', [data, kajianId], (err, result) => {
         if (!err) {
           resolve(result)
         } else {

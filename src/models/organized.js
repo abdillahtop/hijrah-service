@@ -95,6 +95,18 @@ module.exports = {
     })
   },
 
+  updateOrganized: (data, userId) => {
+    return new Promise((resolve, reject) => {
+      connection.query('UPDATE organized SET ? WHERE user_id = ?', [data, userId], (err, result) => {
+        if (!err) {
+          resolve(result)
+        } else {
+          reject(new Error(err))
+        }
+      })
+    })
+  },
+
   deleteOrganized: async (organizedId, userId) => {
     return new Promise((resolve, reject) => {
       connection.query('DELETE FROM organized WHERE organized_id = ?', organizedId, async (err, result) => {

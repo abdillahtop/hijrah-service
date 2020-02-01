@@ -119,84 +119,45 @@ module.exports = {
     const checkKajian = await kajianModels.checkKajian(req.params.kajianId)
     if (checkCategory[0] === undefined) {
       MiscHelper.response(res, 'Category not found', 404)
-      next()
-    }
-    if (checkOrganized[0] === undefined) {
+    } else if (checkOrganized[0] === undefined) {
       MiscHelper.response(res, 'Organized not found', 404)
     } else if (checkKajian[0].kajian_id === undefined) {
       MiscHelper.response(res, 'Kajian not found', 202)
     } else {
-      if (req.body.categoryId === 3) {
-        const date = dateFormat(req.body.endDate, 'yyyy-mm-dd')
-        const data = {
-          kajian_id: checkKajian[0].kajian_id,
-          adminKajianId: checkOrganized[0].organized_id,
-          adminKajianName: req.body.adminNameKajian,
-          categoryName: checkCategory[0].name,
-          location: req.body.location,
-          startDate: req.body.startDate,
-          endDate: req.body.endDate,
-          endDateFormat: date + 'T' + req.body.timeEnd,
-          timeStart: req.body.timeStart,
-          timeEnd: req.body.timeEnd,
-          description: req.body.description,
-          title: req.body.title,
-          linkVideo: req.body.linkVideo,
-          kajianPhoneNumber: req.body.phoneNumber,
-          latitude: parseFloat(req.body.latitude),
-          longitude: parseFloat(req.body.longitude),
-          locationMap: req.body.locationMap,
-          publishAt: checkKajian[0].publishAt,
-          active: true,
-          isUstadz: true,
-          image: await geturl(),
-          count_member: checkKajian[0].count_member
-        }
-        kajianModels
-          .updateKajian(data)
-          .then(() => {
-            MiscHelper.response(res, 'Kajian has been Insert', 200)
-          })
-          .catch(error => {
-            MiscHelper.response(res, 'Bad request', 400)
-            console.log('erronya ' + error)
-          })
-      } else {
-        const date = dateFormat(req.body.endDate, 'yyyy-mm-dd')
-        const data = {
-          kajian_id: checkKajian[0].kajian_id,
-          adminKajianId: checkOrganized[0].organized_id,
-          adminKajianName: req.body.adminNameKajian,
-          categoryName: checkCategory[0].name,
-          location: req.body.location,
-          startDate: req.body.startDate,
-          endDate: req.body.endDate,
-          endDateFormat: date + 'T' + req.body.timeEnd,
-          timeStart: req.body.timeStart,
-          timeEnd: req.body.timeEnd,
-          description: req.body.description,
-          title: req.body.title,
-          linkVideo: req.body.linkVideo,
-          kajianPhoneNumber: req.body.phoneNumber,
-          latitude: parseFloat(req.body.latitude),
-          longitude: parseFloat(req.body.longitude),
-          locationMap: req.body.locationMap,
-          publishAt: checkKajian[0].publishAt,
-          active: true,
-          isUstadz: true,
-          image: await geturl(),
-          count_member: checkKajian[0].count_member
-        }
-        kajianModels
-          .updateKajian(data)
-          .then(() => {
-            MiscHelper.response(res, data.kajian_id, 200, 'Kajian has been Insert')
-          })
-          .catch(error => {
-            MiscHelper.response(res, 'Bad request', 400)
-            console.log('erronya ' + error)
-          })
+      const date = dateFormat(req.body.endDate, 'yyyy-mm-dd')
+      const data = {
+        kajian_id: checkKajian[0].kajian_id,
+        adminKajianId: checkOrganized[0].organized_id,
+        adminKajianName: req.body.adminNameKajian,
+        categoryName: checkCategory[0].name,
+        location: req.body.location,
+        startDate: req.body.startDate,
+        endDate: req.body.endDate,
+        endDateFormat: date + 'T' + req.body.timeEnd,
+        timeStart: req.body.timeStart,
+        timeEnd: req.body.timeEnd,
+        description: req.body.description,
+        title: req.body.title,
+        linkVideo: req.body.linkVideo,
+        kajianPhoneNumber: req.body.phoneNumber,
+        latitude: parseFloat(req.body.latitude),
+        longitude: parseFloat(req.body.longitude),
+        locationMap: req.body.locationMap,
+        publishAt: checkKajian[0].publishAt,
+        active: checkKajian[0].active,
+        isUstadz: checkKajian[0].isUstadz,
+        image: await geturl(),
+        count_member: checkKajian[0].count_member
       }
+      kajianModels
+        .updateKajian(data, req.params.kajianId)
+        .then(() => {
+          MiscHelper.response(res, 'Kajian has been update', 200)
+        })
+        .catch(error => {
+          MiscHelper.response(res, 'Bad request', 400)
+          console.log('erronya ' + error)
+        })
     }
   },
 

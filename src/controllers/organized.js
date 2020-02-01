@@ -1,9 +1,10 @@
+const userModels = require('../models/users')
 const organizedModels = require('../models/organized')
 const MiscHelper = require('../helpers/helpers')
 const uuidv4 = require('uuid/v4')
 const dateFormat = require('dateformat')
 const nodemailer = require('nodemailer')
-// const validate = require('validate.js')
+const validate = require('validate.js')
 
 module.exports = {
   getIndex: (req, res) => {
@@ -107,6 +108,41 @@ module.exports = {
       }
     } else {
       MiscHelper.response(res, 'Your role not allowed', 201)
+    }
+  },
+
+  updateOrganized: async (req, res) => {
+    const checkUser = await userModels.getUser(req.user_id)
+    const organizedDetail = await organizedModels.getOrganizer(req.user_id)
+    if (checkUser[0] === undefined) {
+      MiscHelper.response(res, 'User not found', 204)
+    } else if (organizedDetail[0] === undefined) {
+      MiscHelper.response(res, 'User not found', 204)
+    } else {
+      const data = {
+        organized_id: organizedDetail[0].organized_id,
+        user_id: req.user_id,
+        name_organized: validate.isEmpty(req.body.nameOrganized) ? organizedDetail[0].name_organized : req.body.nameOrganized,
+        email: checkUser[0].email,
+        salt: checkUser[0].salt,
+        password: checkUser[0].password,
+        address: validate.isEmpty(req.body.address) ? organizedDetail[0].address : req.body.address,
+        profile_url: validate.isEmpty(req.body.profileUrl) ? organizedDetail[0].profile_url : req.body.profileUrl,
+        phone_number: validate.isEmpty(req.body.phoneNumber) ? organizedDetail[0].phone_number : req.body.phoneNumber,
+        description: validate.isEmpty(req.body.description) ? organizedDetail[0].description : req.body.description,
+        management: validate.isEmpty(req.body.nameManagement) ? organizedDetail[0].management : req.body.nameManagement,
+        created_at: organizedDetail[0].created_at,
+        updated_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
+        activation: organizedDetail[0].activation
+      }
+      organizedModels.updateOrganized(data, req.user_id)
+        .then(() => {
+          MiscHelper.response(res, 'Data has been updated', 200)
+        })
+        .catch((err) => {
+          console.log(err)
+          MiscHelper.response(res, 'Bad request', 400)
+        })
     }
   },
 
