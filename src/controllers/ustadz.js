@@ -55,9 +55,10 @@ module.exports = {
   },
 
   deleteUstadz: (req, res) => {
-    const ustadzId = req.params.ustadzId
+    const ustadzId = req.query.ustadzId
+    const kajianId = req.query.kajianId
     ustadzModels
-      .deleteUstadz(ustadzId)
+      .deleteUstadz(ustadzId, kajianId)
       .then(() => {
         MiscHelper.response(res, 'Ustadz has been delete', 200)
       })

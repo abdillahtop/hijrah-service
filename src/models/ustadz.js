@@ -20,9 +20,9 @@ module.exports = {
     })
   },
 
-  deleteUstadz: (ustadzId) => {
+  deleteUstadz: (ustadzId, kajianId) => {
     return new Promise((resolve, reject) => {
-      connection.query('DELETE FROM ustadz WHERE ustadz_id = ?', ustadzId, (err, result) => {
+      connection.query('DELETE FROM ustadz WHERE ustadz_id = ? AND kajian_id = ?', [ustadzId, kajianId], (err, result) => {
         if (!err) {
           resolve(result)
         } else {
@@ -34,7 +34,7 @@ module.exports = {
 
   getUstadzByKajian: (kajianId) => {
     return new Promise((resolve, reject) => {
-      connection.query('SELECT ustadz.ustadz_name, ustadz.image FROM ustadz JOIN kajian ON ustadz.kajian_id = kajian.kajian_id WHERE kajian.kajian_id = ?', kajianId, (err, result) => {
+      connection.query('SELECT ustadz.ustadz_id, ustadz.ustadz_name, ustadz.image FROM ustadz JOIN kajian ON ustadz.kajian_id = kajian.kajian_id WHERE kajian.kajian_id = ?', kajianId, (err, result) => {
         if (!err) {
           resolve(result)
         } else {
