@@ -18,5 +18,5 @@ Route
   .get('/', UstadzController.getIndex)
   .get('/list-ustadz', UstadzController.getUstadzByKajian)
   .post('/add-ustadz', upload.single('image'), Auth.accesstoken, UstadzController.addUstadz)
-  .delete('/:ustadzId', Auth.accesstoken, UstadzController.deleteUstadz)
+  .delete('/', Auth.accesstoken, UstadzController.deleteUstadz)
 module.exports = Route

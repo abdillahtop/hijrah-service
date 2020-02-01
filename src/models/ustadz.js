@@ -42,5 +42,17 @@ module.exports = {
         }
       })
     })
+  },
+
+  getUstadzOne: (kajianId, ustadzId) => {
+    return new Promise((resolve, reject) => {
+      connection.query('SELECT ustadz.ustadz_id, ustadz.ustadz_name, ustadz.image FROM ustadz JOIN kajian ON ustadz.kajian_id = kajian.kajian_id WHERE kajian.kajian_id = ? AND ustadz.ustadz_id = ?', [kajianId, ustadzId], (err, result) => {
+        if (!err) {
+          resolve(result)
+        } else {
+          reject(new Error(err))
+        }
+      })
+    })
   }
 }

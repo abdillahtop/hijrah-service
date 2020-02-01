@@ -54,18 +54,27 @@ module.exports = {
     }
   },
 
-  deleteUstadz: (req, res) => {
+  deleteUstadz: async (req, res) => {
     const ustadzId = req.query.ustadzId
     const kajianId = req.query.kajianId
-    ustadzModels
-      .deleteUstadz(ustadzId, kajianId)
-      .then(() => {
-        MiscHelper.response(res, 'Ustadz has been delete', 200)
-      })
-      .catch(error => {
-        MiscHelper.response(res, 'Bad request!', 400)
-        console.log('Err ' + error)
-      })
+
+    const ustadzOne = await ustadzModels.getUstadzOne(kajianId, ustadzId)
+    const checkKajian = await kajianModels.checkKajian(kajianId)
+    if (checkKajian[0] === undefined) {
+      MiscHelper.response(res, 'Kajian not found', 202)
+    } else if (ustadzOne[0] === undefined) {
+      MiscHelper.response(res, 'Ustadz not found', 202)
+    } else {
+      ustadzModels
+        .deleteUstadz(ustadzId, kajianId)
+        .then(() => {
+          MiscHelper.response(res, 'Ustadz has been delete', 200)
+        })
+        .catch(error => {
+          MiscHelper.response(res, 'Bad request!', 400)
+          console.log('Err ' + error)
+        })
+    }
   },
 
   getUstadzByKajian: (req, res) => {
