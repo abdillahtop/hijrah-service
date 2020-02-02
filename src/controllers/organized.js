@@ -2,6 +2,7 @@ const userModels = require('../models/users')
 const organizedModels = require('../models/organized')
 const MiscHelper = require('../helpers/helpers')
 const uuidv4 = require('uuid/v4')
+const cloudinary = require('cloudinary')
 const dateFormat = require('dateformat')
 const nodemailer = require('nodemailer')
 const validate = require('validate.js')
@@ -17,13 +18,32 @@ module.exports = {
   register: async (req, res) => {
     const checkOrganized = await organizedModels.getOrganizerbyEmail(req.body.email)
     if (checkOrganized[0] === undefined) {
+      const path = await req.file.path
+      const geturl = async (req) => {
+        cloudinary.config({
+          cloud_name: process.env.CLOUD_NAME,
+          api_key: process.env.API_CLOUD_KEY,
+          api_secret: process.env.API_CLOUD_SECRET
+        })
+
+        let dataCloudinary
+        await cloudinary.uploader.upload(path, (result) => {
+          if (result.error) {
+            MiscHelper.response(res, 'Cloud Server disable', 500)
+          } else {
+            dataCloudinary = result.url
+          }
+        })
+        return dataCloudinary
+      }
+
       const data = {
         organized_id: uuidv4(),
         user_id: req.user_id,
         name_organized: req.body.nameOrganized,
         email: req.body.email,
         address: req.body.address,
-        profile_url: req.body.profileUrl,
+        profile_url: await geturl(),
         phone_number: req.body.phoneNumber,
         description: req.body.description,
         management: req.body.nameManagement,
@@ -105,11 +125,32 @@ module.exports = {
   updateOrganized: async (req, res) => {
     const checkUser = await userModels.getUser(req.user_id)
     const organizedDetail = await organizedModels.getOrganizer(req.user_id)
+
     if (checkUser[0] === undefined) {
       MiscHelper.response(res, 'User not found', 204)
     } else if (organizedDetail[0] === undefined) {
       MiscHelper.response(res, 'User not found', 204)
     } else {
+      const path = await req.file.path
+      const geturl = async (req) => {
+        cloudinary.config({
+          cloud_name: process.env.CLOUD_NAME,
+          api_key: process.env.API_CLOUD_KEY,
+          api_secret: process.env.API_CLOUD_SECRET
+        })
+
+        let dataCloudinary
+        await cloudinary.uploader.upload(path, (result) => {
+          if (result.error) {
+            MiscHelper.response(res, 'Cloud Server disable', 500)
+          } else {
+            dataCloudinary = result.url
+          }
+        })
+
+        return dataCloudinary
+      }
+
       const data = {
         organized_id: organizedDetail[0].organized_id,
         user_id: req.user_id,
@@ -118,7 +159,7 @@ module.exports = {
         salt: checkUser[0].salt,
         password: checkUser[0].password,
         address: validate.isEmpty(req.body.address) ? organizedDetail[0].address : req.body.address,
-        profile_url: validate.isEmpty(req.body.profileUrl) ? organizedDetail[0].profile_url : req.body.profileUrl,
+        profile_url: await geturl(),
         phone_number: validate.isEmpty(req.body.phoneNumber) ? organizedDetail[0].phone_number : req.body.phoneNumber,
         description: validate.isEmpty(req.body.description) ? organizedDetail[0].description : req.body.description,
         management: validate.isEmpty(req.body.nameManagement) ? organizedDetail[0].management : req.body.nameManagement,

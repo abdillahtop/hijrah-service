@@ -513,62 +513,135 @@ module.exports = {
   },
 
   detailKajian: async (req, res) => {
-    const checkKajian = await kajianModels.checkKajian(req.params.kajianId)
-    const kajian = checkKajian[0]
-    if (kajian === undefined) {
-      MiscHelper.response(res, 'Kajian not found', 204)
-    } else {
-      const checkOrganized = await organizedModels.checkOrganized(checkKajian[0].adminKajianId)
-      const memberKajian = await kajianModels.memberKajian(req.params.kajianId)
-      const listUstadz = await ustadzModels.getUstadzByKajian(req.params.kajianId)
-      if (checkOrganized[0] === undefined) {
-        MiscHelper.response(res, 'Organized not found', 404)
+    if (req.user_id === undefined) {
+      const checkKajian = await kajianModels.checkKajian(req.params.kajianId)
+      const kajian = checkKajian[0]
+      if (kajian === undefined) {
+        MiscHelper.response(res, 'Kajian not found', 204)
       } else {
-        const detailEvent = []
-        const listMember = []
-        const listUstadzs = []
-        const detailKajian = model.detailKajian()
-        detailKajian.title = kajian.title
-        detailKajian.photoKajian = kajian.image
-        detailKajian.linkKajian = kajian.linkVideo
-        const testDate = dateFormat(kajian.startDate, 'ddd, mmmm, dd, yyyy')
-        const testDateEnd = dateFormat(kajian.endDate, 'ddd, mmmm, dd, yyyy')
-        const dateStart = testDate.split(',')
-        const dateEnd = testDateEnd.split(',')
-        if (testDate === testDateEnd) {
-          detailKajian.date = dateStart[2] + dateStart[1] + dateStart[3]
-        } else if (dateStart[1] === dateEnd[1]) {
-          detailKajian.date = dateStart[2] + '-' + dateEnd[2] + dateStart[1] + dateStart[3]
-        } else if (dateStart[1] !== dateEnd[1]) {
-          detailKajian.date = dateStart[2] + '-' + dateEnd[2] + dateStart[1] + '-' + dateEnd[1] + dateStart[3]
-        } else if (dateStart[3] === dateEnd[3]) {
-          detailKajian.date = dateStart[2] + '-' + dateEnd[2] + dateStart[1] + dateStart[3]
-        } else if (dateStart[3] !== dateEnd[3]) {
-          detailKajian.date = dateStart[2] + '-' + dateEnd[2] + dateStart[1] + dateStart[3] + '-' + dateEnd[3]
+        const checkOrganized = await organizedModels.checkOrganized(checkKajian[0].adminKajianId)
+        const memberKajian = await kajianModels.memberKajian(req.params.kajianId)
+        const listUstadz = await ustadzModels.getUstadzByKajian(req.params.kajianId)
+        if (checkOrganized[0] === undefined) {
+          MiscHelper.response(res, 'Organized not found', 404)
+        } else {
+          const detailEvent = []
+          const listMember = []
+          const listUstadzs = []
+          const detailKajian = model.detailKajian()
+          detailKajian.title = kajian.title
+          detailKajian.photoKajian = kajian.image
+          detailKajian.linkKajian = kajian.linkVideo
+          detailKajian.startDate = kajian.startDate
+          detailKajian.endDate = kajian.endDate
+          detailKajian.timeStart = kajian.timeStart
+          detailKajian.timeEnd = kajian.timeEnd
+          detailKajian.description = kajian.description
+          detailKajian.location = kajian.locationMap
+          detailKajian.latitude = kajian.latitude
+          detailKajian.longitude = kajian.longitude
+          if (memberKajian[0] === '') {
+            listMember.push('Nothing Member here')
+          } else {
+            listMember.push(memberKajian[0])
+          }
+          detailKajian.attended = listMember[0]
+          if (memberKajian[1] < 50) {
+            const attent = memberKajian[1].toString()
+            detailKajian.countAttended = attent
+          } else if (memberKajian[1] < 100) {
+            detailKajian.countAttended = '50+'
+          } else if (memberKajian[1] < 500) {
+            detailKajian.countAttended = '100+'
+          } else if (memberKajian[1] < 1000) {
+            detailKajian.countAttended = '1K'
+          } else {
+            detailKajian.countAttended = memberKajian[1]
+          }
+          if (listUstadz[0] === '') {
+            listUstadzs.push('nothing Ustadz here')
+          } else {
+            listUstadzs.push(listUstadz)
+          }
+          detailKajian.isJoin = false
+          detailKajian.ustadz = listUstadzs
+          detailEvent.push(detailKajian)
+          MiscHelper.response(res, detailEvent, 200, 'Get Detail Kajian Success')
         }
+      }
+    } else {
+      const checkKajian = await kajianModels.checkKajian(req.params.kajianId)
+      const kajian = checkKajian[0]
+      if (kajian === undefined) {
+        MiscHelper.response(res, 'Kajian not found', 204)
+      } else {
+        const checkOrganized = await organizedModels.checkOrganized(checkKajian[0].adminKajianId)
+        const memberKajian = await kajianModels.memberKajian(req.params.kajianId)
+        const listUstadz = await ustadzModels.getUstadzByKajian(req.params.kajianId)
+        if (checkOrganized[0] === undefined) {
+          MiscHelper.response(res, 'Organized not found', 404)
+        } else {
+          const detailEvent = []
+          const listMember = []
+          const listUstadzs = []
+          const detailKajian = model.detailKajian()
+          detailKajian.title = kajian.title
+          detailKajian.photoKajian = kajian.image
+          detailKajian.linkKajian = kajian.linkVideo
+          const testDate = dateFormat(kajian.startDate, 'ddd, mmmm, dd, yyyy')
+          const testDateEnd = dateFormat(kajian.endDate, 'ddd, mmmm, dd, yyyy')
+          const dateStart = testDate.split(',')
+          const dateEnd = testDateEnd.split(',')
+          if (testDate === testDateEnd) {
+            detailKajian.date = dateStart[2] + dateStart[1] + dateStart[3]
+          } else if (dateStart[1] === dateEnd[1]) {
+            detailKajian.date = dateStart[2] + '-' + dateEnd[2] + dateStart[1] + dateStart[3]
+          } else if (dateStart[1] !== dateEnd[1]) {
+            detailKajian.date = dateStart[2] + '-' + dateEnd[2] + dateStart[1] + '-' + dateEnd[1] + dateStart[3]
+          } else if (dateStart[3] === dateEnd[3]) {
+            detailKajian.date = dateStart[2] + '-' + dateEnd[2] + dateStart[1] + dateStart[3]
+          } else if (dateStart[3] !== dateEnd[3]) {
+            detailKajian.date = dateStart[2] + '-' + dateEnd[2] + dateStart[1] + dateStart[3] + '-' + dateEnd[3]
+          }
 
-        const timeStart = kajian.timeStart.split(':')
-        const timeEnd = kajian.timeEnd.split(':')
-        detailKajian.time = timeEnd == 'Selesai' ? timeStart[0] + ':' + timeStart[1] + ' - ' + timeEnd[0] : timeStart[0] + ':' + timeStart[1] + ' - ' + timeEnd[0] + ':' + timeEnd[1]
-        detailKajian.description = kajian.description
-        detailKajian.location = kajian.locationMap
-        detailKajian.latitude = kajian.latitude
-        detailKajian.longitude = kajian.longitude
-        if (memberKajian[0] === '') {
-          listMember.push('Nothing Member here')
-        } else {
-          listMember.push(memberKajian[0])
+          const timeStart = kajian.timeStart.split(':')
+          const timeEnd = kajian.timeEnd.split(':')
+          detailKajian.time = timeEnd == 'Selesai' ? timeStart[0] + ':' + timeStart[1] + ' - ' + timeEnd[0] : timeStart[0] + ':' + timeStart[1] + ' - ' + timeEnd[0] + ':' + timeEnd[1]
+          detailKajian.description = kajian.description
+          detailKajian.location = kajian.locationMap
+          detailKajian.latitude = kajian.latitude
+          detailKajian.longitude = kajian.longitude
+          if (memberKajian[0] === '') {
+            listMember.push('Nothing Member here')
+          } else {
+            listMember.push(memberKajian[0])
+          }
+          detailKajian.attended = listMember[0]
+          if (memberKajian[1] < 50) {
+            const attent = memberKajian[1].toString()
+            detailKajian.countAttended = attent
+          } else if (memberKajian[1] < 100) {
+            detailKajian.countAttended = '50+'
+          } else if (memberKajian[1] < 500) {
+            detailKajian.countAttended = '100+'
+          } else if (memberKajian[1] < 1000) {
+            detailKajian.countAttended = '1K'
+          } else {
+            detailKajian.countAttended = memberKajian[1]
+          }
+          if (listUstadz[0] === '') {
+            listUstadzs.push('nothing Ustadz here')
+          } else {
+            listUstadzs.push(listUstadz)
+          }
+          const checkMember = await kajianModels.checkMemberKajian(req.params.kajianId, req.user_id)
+          if (checkMember[0] !== undefined) {
+            detailKajian.isJoin = true
+          }
+          detailKajian.ustadz = listUstadzs
+          detailEvent.push(detailKajian)
+          MiscHelper.response(res, detailEvent, 200, 'Get Detail Kajian Success')
         }
-        detailKajian.attended = listMember
-        detailKajian.countAttended = memberKajian[1]
-        if (listUstadz[0] === '') {
-          listUstadzs.push('nothing Ustadz here')
-        } else {
-          listUstadzs.push(listUstadz)
-        }
-        detailKajian.ustadz = listUstadzs
-        detailEvent.push(detailKajian)
-        MiscHelper.response(res, detailEvent, 200, 'Get Detail Kajian Success')
       }
     }
   }
