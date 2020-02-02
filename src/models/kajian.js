@@ -356,7 +356,7 @@ module.exports = {
   getKajinbyOrganized: (dateNow, organizedId, categoryName, limit, page) => {
     const offset = (limit * page) - limit
     return new Promise((resolve, reject) => {
-      connection.query('UPDATE kajian WHERE endDate <= ?', [0, dateNow], async (err1, result1) => {
+      connection.query('UPDATE kajian SET active = ? WHERE endDate <= ?', [0, dateNow], async (err1, result1) => {
         if (!err1) {
           await connection.query('SELECT count(*) as total FROM kajian WHERE isUstadz = 1 AND categoryName = ? AND adminKajianId = ?', [categoryName, organizedId], async (err2, result2) => {
             if (!err2) {
