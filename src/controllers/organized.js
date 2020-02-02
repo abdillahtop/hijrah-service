@@ -15,40 +15,31 @@ module.exports = {
   },
 
   register: async (req, res) => {
-    const checkOrganized = await organizedModels.getOrganizer(req.user_id)
-
+    const checkOrganized = await organizedModels.getOrganizerbyEmail(req.body.email)
     if (checkOrganized[0] === undefined) {
-      const checkUser = await organizedModels.getUser(req.user_id)
-
-      if (checkUser[0] === undefined) {
-        MiscHelper.response(res, 'User not found', 204)
-      } else {
-        const data = {
-          organized_id: uuidv4(),
-          user_id: req.user_id,
-          name_organized: req.body.nameOrganized,
-          email: checkUser[0].email,
-          salt: checkUser[0].salt,
-          password: checkUser[0].password,
-          address: req.body.address,
-          profile_url: req.body.profileUrl,
-          phone_number: req.body.phoneNumber,
-          description: req.body.description,
-          management: req.body.nameManagement,
-          created_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
-          updated_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
-          activation: 0
-        }
-        organizedModels
-          .registerOrganizer(data)
-          .then(() => {
-            MiscHelper.response(res, 'Organized has been register', 200)
-          })
-          .catch(error => {
-            MiscHelper.response(res, 'Bad Request', 400)
-            console.log('error ' + error)
-          })
+      const data = {
+        organized_id: uuidv4(),
+        user_id: req.user_id,
+        name_organized: req.body.nameOrganized,
+        email: req.body.email,
+        address: req.body.address,
+        profile_url: req.body.profileUrl,
+        phone_number: req.body.phoneNumber,
+        description: req.body.description,
+        management: req.body.nameManagement,
+        created_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
+        updated_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
+        activation: 0
       }
+      organizedModels
+        .registerOrganizer(data)
+        .then(() => {
+          MiscHelper.response(res, 'Register organized success', 200)
+        })
+        .catch(error => {
+          MiscHelper.response(res, 'Bad Request', 400)
+          console.log('error ' + error)
+        })
     } else {
       MiscHelper.response(res, 'Organized has been used', 401)
     }
@@ -123,7 +114,7 @@ module.exports = {
         organized_id: organizedDetail[0].organized_id,
         user_id: req.user_id,
         name_organized: validate.isEmpty(req.body.nameOrganized) ? organizedDetail[0].name_organized : req.body.nameOrganized,
-        email: checkUser[0].email,
+        email: validate.isEmpty(req.body.email) ? organizedDetail[0].email : req.body.email,
         salt: checkUser[0].salt,
         password: checkUser[0].password,
         address: validate.isEmpty(req.body.address) ? organizedDetail[0].address : req.body.address,

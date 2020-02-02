@@ -21,7 +21,7 @@ Route
   .get('/kajian-cat', KajianController.getAllKajianByCategory)
   .get('/kajian-nearby', KajianController.getAllKajianNearby)
   .get('/kajian-populer', KajianController.getAllKajianPopuler)
-  .get('/kajian-user', Auth.accesstoken, KajianController.getKajianbyUser)
+  .get('/kajian-user/:active', Auth.accesstoken, KajianController.getKajianbyUser)
   .get('/kajian-organized', Auth.accesstoken, KajianController.getKajianbyOrganized)
   .get('/find-kajian', KajianController.findKajian)
   .get('/detail-kajian/:kajianId', KajianController.detailKajian)

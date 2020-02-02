@@ -191,27 +191,72 @@ module.exports = {
     })
   },
 
-  findKajian: (latitude, longitude, search) => {
+  // findKajian: (latitude, longitude, search) => {
+  //   return new Promise((resolve, reject) => {
+  //     const find = `%${search}%`
+  //     connection.query('SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ? ) ) * cos( radians( ? ) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians( ? )) ) ) AS distance FROM kajian WHERE title LIKE ? AND isUstadz = 1 AND active = 1 HAVING distance < 1000 ORDER BY distance LIMIT 20 ', [latitude, longitude, latitude, find], (err, result) => {
+  //       if (!err) {
+  //         resolve(result)
+  //       } else {
+  //         reject(err)
+  //       }
+  //     })
+  //   })
+  // },
+
+  findKajian: (dateNow, latitude, longitude, search, limit, page) => {
+    const offset = (limit * page) - limit
     return new Promise((resolve, reject) => {
-      const find = `%${search}%`
-      connection.query('SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ? ) ) * cos( radians( ? ) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians( ? )) ) ) AS distance FROM kajian WHERE title LIKE ? AND isUstadz = 1 AND active = 1 HAVING distance < 1000 ORDER BY distance LIMIT 20 ', [latitude, longitude, latitude, find], (err, result) => {
-        if (!err) {
-          resolve(result)
+      connection.query('UPDATE kajian SET active = ? WHERE endDate <= ?', [0, dateNow], async (err1, result1) => {
+        if (!err1) {
+          const find = `%${search}%`
+          await connection.query('SELECT count(*) as total FROM kajian WHERE title LIKE ? AND isUstadz = 1 AND active = 1', find, async (err2, result2) => {
+            if (!err2) {
+              const find = `%${search}%`
+              const totalData = result2[0].total
+              const totalPage = Math.ceil(totalData / limit)
+              await connection.query('SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ? ) ) * cos( radians( ? ) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians( ? )) ) ) AS distance FROM kajian WHERE title LIKE ? AND isUstadz = 1 AND active = 1 HAVING distance < 1000 ORDER BY distance LIMIT ? OFFSET ?', [latitude, longitude, latitude, find, limit, offset], (err3, results) => {
+                if (!err3) {
+                  resolve([results, totalData, page, totalPage])
+                } else {
+                  reject(new Error(err3))
+                }
+              })
+            } else {
+              reject(new Error(err2))
+            }
+          })
         } else {
-          reject(err)
+          reject(new Error(err1))
         }
       })
     })
   },
 
-  findKajianByCat: (catId, latitude, longitude, search) => {
+  findKajianByCat: (dateNow, catId, latitude, longitude, search, limit, page) => {
+    const offset = (limit * page) - limit
     return new Promise((resolve, reject) => {
-      const find = `${search}%`
-      connection.query('SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ? ) ) * cos( radians( ? ) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians( ? )) ) ) AS distance FROM kajian WHERE title LIKE ? AND isUstadz = 1 AND categoryName = ? HAVING distance < 1000 ORDER BY distance LIMIT 20 ', [latitude, longitude, latitude, find, catId], (err, result) => {
-        if (!err) {
-          resolve(result)
+      connection.query('UPDATE kajian SET active = ? WHERE endDate <= ?', [0, dateNow], async (err1, result1) => {
+        if (!err1) {
+          const find = `%${search}%`
+          await connection.query('SELECT count(*) as total FROM kajian WHERE title LIKE ? AND isUstadz = 1 AND active = 1 AND categoryName = ?', [find, catId], async (err2, result2) => {
+            if (!err2) {
+              const find = `%${search}%`
+              const totalData = result2[0].total
+              const totalPage = Math.ceil(totalData / limit)
+              await connection.query('SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ? ) ) * cos( radians( ? ) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians( ? )) ) ) AS distance FROM kajian WHERE title LIKE ? AND isUstadz = 1 AND categoryName = ? HAVING distance < 1000 ORDER BY distance LIMIT ? OFFSET ?', [latitude, longitude, latitude, find, catId, limit, offset], (err3, results) => {
+                if (!err3) {
+                  resolve([results, totalData, page, totalPage])
+                } else {
+                  reject(new Error(err3))
+                }
+              })
+            } else {
+              reject(new Error(err2))
+            }
+          })
         } else {
-          reject(err)
+          reject(new Error(err1))
         }
       })
     })
@@ -254,9 +299,9 @@ module.exports = {
     })
   },
 
-  getKajianByUser: (userId) => {
+  getKajianByUser: (userId, active) => {
     return new Promise((resolve, reject) => {
-      connection.query('SELECT kajian.kajian_id, kajian.title, kajian.image, kajian.categoryName, kajian.startDate, kajian.endDate, kajian.timeStart, kajian.timeEnd, kajian.location, kajian.payment FROM kajian JOIN member_kajian ON kajian.kajian_id = member_kajian.kajian_id WHERE member_kajian.user_id = ?', userId, async (err, result) => {
+      connection.query('SELECT kajian.kajian_id, kajian.title, kajian.image, kajian.categoryName, kajian.startDate, kajian.endDate, kajian.timeStart, kajian.timeEnd, kajian.location, kajian.payment FROM kajian JOIN member_kajian ON kajian.kajian_id = member_kajian.kajian_id WHERE member_kajian.user_id = ? AND kajian.active = ?', [userId, active], async (err, result) => {
         if (!err) {
           await resolve(result)
         } else {
@@ -308,16 +353,16 @@ module.exports = {
     })
   },
 
-  getKajinbyOrganized: (dateNow, organizedId, active, categoryName, limit, page) => {
+  getKajinbyOrganized: (dateNow, organizedId, categoryName, limit, page) => {
     const offset = (limit * page) - limit
     return new Promise((resolve, reject) => {
-      connection.query('UPDATE kajian SET active = ? WHERE endDate <= ?', [0, dateNow], async (err1, result1) => {
+      connection.query('UPDATE kajian WHERE endDate <= ?', [0, dateNow], async (err1, result1) => {
         if (!err1) {
           await connection.query('SELECT count(*) as total FROM kajian WHERE isUstadz = 1 AND categoryName = ? AND adminKajianId = ?', [categoryName, organizedId], async (err2, result2) => {
             if (!err2) {
               const totalData = result2[0].total
               const totalPage = Math.ceil(totalData / limit)
-              await connection.query('SELECT kajian.kajian_id, kajian.title,image, kajian.categoryName, kajian.startDate, kajian.endDate, timeStart, timeEnd, kajian.location, kajian.payment FROM kajian JOIN organized ON kajian.adminKajianId = organized.organized_id WHERE organized.organized_id = ? AND active = ? AND categoryName = ? AND isUstadz = 1 ORDER BY kajian.startDate desc LIMIT ? OFFSET ?', [organizedId, active, categoryName, limit, offset], (err3, results) => {
+              await connection.query('SELECT kajian.kajian_id, kajian.title,image, kajian.categoryName, kajian.startDate, kajian.endDate, timeStart, timeEnd, kajian.location, kajian.payment FROM kajian JOIN organized ON kajian.adminKajianId = organized.organized_id WHERE organized.organized_id = ? AND categoryName = ? AND isUstadz = 1 ORDER BY kajian.startDate desc LIMIT ? OFFSET ?', [organizedId, categoryName, limit, offset], (err3, results) => {
                 if (!err3) {
                   resolve([results, totalData, page, totalPage])
                 } else {

@@ -26,6 +26,18 @@ module.exports = {
     })
   },
 
+  getOrganizerbyEmail: (email) => {
+    return new Promise((resolve, reject) => {
+      connection.query('SELECT * FROM organized WHERE email = ? ', email, async (err, result) => {
+        if (!err) {
+          await resolve(result)
+        } else {
+          await reject(new Error(err))
+        }
+      })
+    })
+  },
+
   getOrganizedById: (organizedId) => {
     return new Promise((resolve, reject) => {
       connection.query('SELECT * FROM organized WHERE organized_id = ?', organizedId, async (err, result) => {

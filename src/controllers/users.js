@@ -209,7 +209,28 @@ module.exports = {
           console.log(error)
         })
     } else {
-      MiscHelper.response(res, 'Email has been used', 401)
+      const result = await userModels.getByEmail(req.body.email)
+      const dataUser = result[0]
+      const usePassword = MiscHelper.setPassword('sobatHijrah', dataUser.salt)
+        .passwordHash
+      if (usePassword === dataUser.password) {
+        dataUser.token = jwt.sign(
+          {
+            user_id: dataUser.user_id,
+            role_id: dataUser.role_id
+          },
+          process.env.SECRET_KEY,
+          { expiresIn: '1000h' }
+        )
+
+        delete dataUser.salt
+        delete dataUser.password
+      }
+      userModels.updateToken(dataUser.token, dataUser.email)
+      const data = {
+        token: dataUser.token
+      }
+      return MiscHelper.response(res, data, 200, 'Email inserted')
     }
   },
 

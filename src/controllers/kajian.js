@@ -61,7 +61,7 @@ module.exports = {
         location: req.body.location,
         startDate: req.body.startDate,
         endDate: req.body.endDate,
-        endDateFormat: date + 'T' + req.body.timeEnd,
+        endDateFormat: req.body.timeEnd == 'Selesai' ? date : date + 'T' + req.body.timeEnd,
         timeStart: req.body.timeStart,
         timeEnd: req.body.timeEnd,
         description: req.body.description,
@@ -326,8 +326,9 @@ module.exports = {
   },
 
   getKajianbyUser: async (req, res) => {
+    const active = req.params.active
     kajianModels
-      .getKajianByUser(req.user_id)
+      .getKajianByUser(req.user_id, active)
       .then(result => {
         if (result === '') {
           MiscHelper.resPagination(res, 'Kajian not found', 204)
@@ -344,7 +345,6 @@ module.exports = {
   getKajianbyOrganized: async (req, res) => {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
-    const active = req.query.active
     const dateNow = new Date()
     const checkOrganized = await organizedModels.getOrganizer(
       req.user_id
@@ -359,7 +359,7 @@ module.exports = {
     }
 
     kajianModels
-      .getKajinbyOrganized(dateNow, checkOrganized[0].organized_id, active, checkCategory[0].name, limit, page)
+      .getKajinbyOrganized(dateNow, checkOrganized[0].organized_id, checkCategory[0].name, limit, page)
       .then(result => {
         if (result === '') {
           MiscHelper.resPagination(res, 'Kajian not found', 204)
@@ -383,14 +383,24 @@ module.exports = {
     const search = await req.query.search
     const latitude = await req.query.latitude
     const longitude = await req.query.longitude
+    const limit = await parseInt(req.query.limit)
+    const page = await parseInt(req.query.page)
+    const dateNow = new Date()
     if (catId === '') {
       kajianModels
-        .findKajian(latitude, longitude, search)
+        .findKajian(dateNow, latitude, longitude, search, limit, page)
         .then(result => {
           if (result[0] === undefined) {
             MiscHelper.response(res, 'list kajian not found', 204)
           } else {
-            MiscHelper.response(res, result, 200)
+            MiscHelper.resPagination(
+              res,
+              result[0],
+              200,
+              result[1],
+              result[2],
+              result[3]
+            )
           }
         })
         .catch(error => {
@@ -402,12 +412,19 @@ module.exports = {
       if (checkCategory[0] === undefined) {
         MiscHelper.response(res, 'Category not found', 404)
       } else {
-        kajianModels.findKajianByCat(checkCategory[0].name, latitude, longitude, search)
+        kajianModels.findKajianByCat(dateNow, checkCategory[0].name, latitude, longitude, search, limit, page)
           .then((result) => {
             if (result[0] === undefined) {
               MiscHelper.response(res, 'list kajian not found', 204)
             } else {
-              MiscHelper.response(res, result, 200)
+              MiscHelper.resPagination(
+                res,
+                result[0],
+                200,
+                result[1],
+                result[2],
+                result[3]
+              )
             }
           })
           .catch(error => {
@@ -532,7 +549,7 @@ module.exports = {
 
         const timeStart = kajian.timeStart.split(':')
         const timeEnd = kajian.timeEnd.split(':')
-        detailKajian.time = timeStart[0] + ':' + timeStart[1] + ' - ' + timeEnd[0] + ':' + timeEnd[1]
+        detailKajian.time = timeEnd == 'Selesai' ? timeStart[0] + ':' + timeStart[1] + ' - ' + timeEnd[0] : timeStart[0] + ':' + timeStart[1] + ' - ' + timeEnd[0] + ':' + timeEnd[1]
         detailKajian.description = kajian.description
         detailKajian.location = kajian.locationMap
         detailKajian.latitude = kajian.latitude
