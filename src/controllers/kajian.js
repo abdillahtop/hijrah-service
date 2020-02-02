@@ -530,14 +530,15 @@ module.exports = {
           const listUstadzs = []
           const detailKajian = model.detailKajian()
           detailKajian.title = kajian.title
-          detailKajian.photoKajian = kajian.image
-          detailKajian.linkKajian = kajian.linkVideo
+          detailKajian.image = kajian.image
+          detailKajian.kajianId = kajian.kajianId
+          detailKajian.linkVideo = kajian.linkVideo
           detailKajian.startDate = kajian.startDate
           detailKajian.endDate = kajian.endDate
           detailKajian.timeStart = kajian.timeStart
           detailKajian.timeEnd = kajian.timeEnd
           detailKajian.description = kajian.description
-          detailKajian.location = kajian.locationMap
+          detailKajian.locationMap = kajian.locationMap
           detailKajian.latitude = kajian.latitude
           detailKajian.longitude = kajian.longitude
           if (memberKajian[0] === '') {
@@ -564,7 +565,8 @@ module.exports = {
             listUstadzs.push(listUstadz)
           }
           detailKajian.isJoin = false
-          detailKajian.ustadz = listUstadzs
+          detailKajian.ustadz = listUstadzs[0]
+          detailKajian.payment = kajian.payment
           detailEvent.push(detailKajian)
           MiscHelper.response(res, detailEvent, 200, 'Get Detail Kajian Success')
         }
@@ -586,29 +588,15 @@ module.exports = {
           const listUstadzs = []
           const detailKajian = model.detailKajian()
           detailKajian.title = kajian.title
-          detailKajian.photoKajian = kajian.image
-          detailKajian.linkKajian = kajian.linkVideo
-          const testDate = dateFormat(kajian.startDate, 'ddd, mmmm, dd, yyyy')
-          const testDateEnd = dateFormat(kajian.endDate, 'ddd, mmmm, dd, yyyy')
-          const dateStart = testDate.split(',')
-          const dateEnd = testDateEnd.split(',')
-          if (testDate === testDateEnd) {
-            detailKajian.date = dateStart[2] + dateStart[1] + dateStart[3]
-          } else if (dateStart[1] === dateEnd[1]) {
-            detailKajian.date = dateStart[2] + '-' + dateEnd[2] + dateStart[1] + dateStart[3]
-          } else if (dateStart[1] !== dateEnd[1]) {
-            detailKajian.date = dateStart[2] + '-' + dateEnd[2] + dateStart[1] + '-' + dateEnd[1] + dateStart[3]
-          } else if (dateStart[3] === dateEnd[3]) {
-            detailKajian.date = dateStart[2] + '-' + dateEnd[2] + dateStart[1] + dateStart[3]
-          } else if (dateStart[3] !== dateEnd[3]) {
-            detailKajian.date = dateStart[2] + '-' + dateEnd[2] + dateStart[1] + dateStart[3] + '-' + dateEnd[3]
-          }
-
-          const timeStart = kajian.timeStart.split(':')
-          const timeEnd = kajian.timeEnd.split(':')
-          detailKajian.time = timeEnd == 'Selesai' ? timeStart[0] + ':' + timeStart[1] + ' - ' + timeEnd[0] : timeStart[0] + ':' + timeStart[1] + ' - ' + timeEnd[0] + ':' + timeEnd[1]
+          detailKajian.image = kajian.image
+          detailKajian.kajianId = kajian.kajianId
+          detailKajian.linkVideo = kajian.linkVideo
+          detailKajian.startDate = kajian.startDate
+          detailKajian.endDate = kajian.endDate
+          detailKajian.timeStart = kajian.timeStart
+          detailKajian.timeEnd = kajian.timeEnd
           detailKajian.description = kajian.description
-          detailKajian.location = kajian.locationMap
+          detailKajian.locationMap = kajian.locationMap
           detailKajian.latitude = kajian.latitude
           detailKajian.longitude = kajian.longitude
           if (memberKajian[0] === '') {
@@ -638,7 +626,8 @@ module.exports = {
           if (checkMember[0] !== undefined) {
             detailKajian.isJoin = true
           }
-          detailKajian.ustadz = listUstadzs
+          detailKajian.payment = kajian.payment
+          detailKajian.ustadz = listUstadzs[0]
           detailEvent.push(detailKajian)
           MiscHelper.response(res, detailEvent, 200, 'Get Detail Kajian Success')
         }
