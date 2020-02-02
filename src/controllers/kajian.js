@@ -625,6 +625,8 @@ module.exports = {
           const checkMember = await kajianModels.checkMemberKajian(req.params.kajianId, req.user_id)
           if (checkMember[0] !== undefined) {
             detailKajian.isJoin = true
+          } else {
+            detailKajian.isJoin = false
           }
           detailKajian.payment = kajian.payment
           detailKajian.ustadz = listUstadzs[0]
