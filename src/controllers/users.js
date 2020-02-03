@@ -445,5 +445,30 @@ module.exports = {
           console.log('Error : ' + err)
         })
     }
+  },
+
+  changePassword: async (req, res) => {
+    const checkEmail = await userModels.getUser(req.user_id)
+    if (req.user_id === undefined) {
+      MiscHelper.response(res, 'User not found', 204)
+    } else {
+      const salt = MiscHelper.generateSalt(64)
+      const passwordHash = MiscHelper.setPassword(req.body.password, salt)
+
+      const data = {
+        password: passwordHash.passwordHash,
+        salt: passwordHash.salt
+      }
+
+      userModels.forgetPassword(data, checkEmail[0].email)
+        .then(() => {
+          MiscHelper.response(res, 'Password change successfull', 200)
+          console.log('Password change successfull')
+        })
+        .catch((err) => {
+          MiscHelper.response(res, 'Bad Request', 400)
+          console.log('Error : ' + err)
+        })
+    }
   }
 }

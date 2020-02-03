@@ -20,6 +20,7 @@ Route
   .get('/userDetail', Auth.accesstoken, UserController.userDetail)
   .get('/verify', UserController.validateCode)
   .post('/activation', Auth.accesstoken, UserController.activationUser)
+  .post('/change-password', Auth.accesstoken, UserController.changePassword)
   .post('/register', UserController.register)
   .post('/register-admin', Auth.authInfo, UserController.registerAdmin)
   .post('/register-gmail', UserController.registerbyGmail)

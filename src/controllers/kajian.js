@@ -122,7 +122,7 @@ module.exports = {
     } else if (checkOrganized[0] === undefined) {
       MiscHelper.response(res, 'Organized not found', 404)
     } else if (checkKajian[0].kajian_id === undefined) {
-      MiscHelper.response(res, 'Kajian not found', 202)
+      MiscHelper.response(res, 'Kajian not found', 204)
     } else {
       const date = dateFormat(req.body.endDate, 'yyyy-mm-dd')
       const data = {
@@ -133,9 +133,9 @@ module.exports = {
         location: req.body.location,
         startDate: req.body.startDate,
         endDate: req.body.endDate,
-        endDateFormat: date + 'T' + req.body.timeEnd,
         timeStart: req.body.timeStart,
         timeEnd: req.body.timeEnd,
+        endDateFormat: req.body.timeEnd == 'Selesai' ? date : date + 'T' + req.body.timeEnd,
         description: req.body.description,
         title: req.body.title,
         linkVideo: req.body.linkVideo,
@@ -481,7 +481,7 @@ module.exports = {
         })
         console.log(status)
         if (status) {
-          MiscHelper.response(res, 'Kajian not found', 202)
+          MiscHelper.response(res, 'Kajian not found', 204)
         }
       }
     }
@@ -499,7 +499,7 @@ module.exports = {
       const checkMemberKajian = await kajianModels.checkMemberKajian(kajianId, req.user_id)
       console.log(JSON.stringify(checkMemberKajian))
       if (checkMemberKajian[0] === undefined) {
-        MiscHelper.response(res, 'Kajian not found', 202)
+        MiscHelper.response(res, 'Kajian not found', 204)
       } else {
         kajianModels.deleteKajianbyUser(checkMemberKajian[0].registration_id)
           .then(() => {
@@ -530,6 +530,7 @@ module.exports = {
           const listUstadzs = []
           const detailKajian = model.detailKajian()
           detailKajian.title = kajian.title
+          detailKajian.categoryName = kajian.categoryName
           detailKajian.image = kajian.image
           detailKajian.kajianId = kajian.kajianId
           detailKajian.linkVideo = kajian.linkVideo
@@ -589,6 +590,7 @@ module.exports = {
           const detailKajian = model.detailKajian()
           detailKajian.title = kajian.title
           detailKajian.image = kajian.image
+          detailKajian.categoryName = kajian.categoryName
           detailKajian.kajianId = kajian.kajianId
           detailKajian.linkVideo = kajian.linkVideo
           detailKajian.startDate = kajian.startDate

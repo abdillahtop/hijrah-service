@@ -3,6 +3,7 @@ const detailKajian = () => {
     title: '',
     image: '',
     linkVideo: '',
+    categoryName: '',
     startDate: '',
     endDate: '',
     timeStart: '',
