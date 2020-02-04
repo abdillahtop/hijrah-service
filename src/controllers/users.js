@@ -461,7 +461,7 @@ module.exports = {
       MiscHelper.response(res, 'User not found', 204)
     } else {
       const usePassword = MiscHelper.setPassword(password, checkEmail[0].salt).passwordHash
-      if (usePassword === checkEmail[0].pasw) {
+      if (usePassword === checkEmail[0].password) {
         const salt = MiscHelper.generateSalt(64)
         const passwordHash = MiscHelper.setPassword(req.body.password, salt)
 
