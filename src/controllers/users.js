@@ -61,6 +61,7 @@ module.exports = {
         role_id: 1,
         verified: false,
         isOrganized: false,
+        isGmail: req.body.isGmail,
         activation_code: ''
       }
 
@@ -159,6 +160,10 @@ module.exports = {
   registerbyGmail: async (req, res) => {
     const checkEmail = await userModels.getByEmail(req.body.email)
 
+    if (req.body.isGmail === undefined) {
+      return MiscHelper.response(res, 'Check body', 400)
+    }
+
     if (checkEmail[0] === undefined) {
       const salt = MiscHelper.generateSalt(64)
       const passwordHash = MiscHelper.setPassword('sobatHijrah', salt)
@@ -176,6 +181,7 @@ module.exports = {
         role_id: 1,
         verified: false,
         isOrganized: false,
+        isGmail: req.body.isGmail,
         activation_code: ''
       }
 
@@ -449,26 +455,33 @@ module.exports = {
 
   changePassword: async (req, res) => {
     const checkEmail = await userModels.getUser(req.user_id)
+    const password = req.body.oldPassword
+
     if (req.user_id === undefined) {
       MiscHelper.response(res, 'User not found', 204)
     } else {
-      const salt = MiscHelper.generateSalt(64)
-      const passwordHash = MiscHelper.setPassword(req.body.password, salt)
+      const usePassword = MiscHelper.setPassword(password, checkEmail[0].salt).passwordHash
+      if (usePassword === checkEmail[0].pasw) {
+        const salt = MiscHelper.generateSalt(64)
+        const passwordHash = MiscHelper.setPassword(req.body.password, salt)
 
-      const data = {
-        password: passwordHash.passwordHash,
-        salt: passwordHash.salt
+        const data = {
+          password: passwordHash.passwordHash,
+          salt: passwordHash.salt
+        }
+
+        userModels.forgetPassword(data, checkEmail[0].email)
+          .then(() => {
+            MiscHelper.response(res, 'Password change successfull', 200)
+            console.log('Password change successfull')
+          })
+          .catch((err) => {
+            MiscHelper.response(res, 'Bad Request', 400)
+            console.log('Error : ' + err)
+          })
+      } else {
+        return MiscHelper.response(res, null, 401, 'Wrong password!')
       }
-
-      userModels.forgetPassword(data, checkEmail[0].email)
-        .then(() => {
-          MiscHelper.response(res, 'Password change successfull', 200)
-          console.log('Password change successfull')
-        })
-        .catch((err) => {
-          MiscHelper.response(res, 'Bad Request', 400)
-          console.log('Error : ' + err)
-        })
     }
   }
 }
