@@ -3,6 +3,7 @@ const MiscHelper = require('../helpers/helpers')
 const userModel = require('../models/users')
 
 const allowedAccess = process.env.REQUEST_HEADERS
+const allowedAccessGmail = process.env.REQUEST_GMAIL_HEADERS
 
 module.exports = {
   authInfo: (req, res, next) => {
@@ -10,6 +11,24 @@ module.exports = {
     const headerSecret = req.headers['x-access-token']
 
     if (headerAuth !== allowedAccess) {
+      return MiscHelper.response(res, null, 401, 'Unauthorized, Need Authentication!')
+    } else if (typeof headerSecret === 'undefined') {
+      console.log('Authentication Valid!')
+      next()
+    } else {
+      const bearerToken = headerSecret.split(' ')
+      const token = bearerToken[1]
+      req.token = token
+      console.log('Token stored!')
+      next()
+    }
+  },
+
+  authGmail: (req, res, next) => {
+    const headerAuth = req.headers.authorization
+    const headerSecret = req.headers['x-access-token']
+
+    if (headerAuth !== allowedAccessGmail) {
       return MiscHelper.response(res, null, 401, 'Unauthorized, Need Authentication!')
     } else if (typeof headerSecret === 'undefined') {
       console.log('Authentication Valid!')

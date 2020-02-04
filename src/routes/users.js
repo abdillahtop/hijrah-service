@@ -23,7 +23,7 @@ Route
   .post('/change-password', Auth.accesstoken, UserController.changePassword)
   .post('/register', UserController.register)
   .post('/register-admin', Auth.authInfo, UserController.registerAdmin)
-  .post('/register-gmail', UserController.registerbyGmail)
+  .post('/register-gmail', Auth.authGmail, UserController.registerbyGmail)
   .post('/forget-password', Auth.authCode, UserController.forgetPassword)
   .post('/send-code', UserController.sendCode)
   .post('/login', UserController.login)
