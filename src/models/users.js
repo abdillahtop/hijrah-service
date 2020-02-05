@@ -117,7 +117,7 @@ module.exports = {
     })
   },
 
-  forgetPassword: (data, email, code) => {
+  forgetPassword: (data, email) => {
     return new Promise((resolve, reject) => {
       connection.query('UPDATE users SET ? WHERE email = ?', [data, email], (err, result) => {
         if (!err) {

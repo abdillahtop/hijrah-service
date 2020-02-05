@@ -14,7 +14,6 @@ module.exports = {
     if (headerAuth !== allowedAccess) {
       return MiscHelper.response(res, null, 401, 'Unauthorized, Need Authentication!')
     } else if (typeof headerSecret === 'undefined') {
-      console.log('Authentication Valid!')
       next()
     } else {
       const bearerToken = headerSecret.split(' ')
@@ -32,7 +31,6 @@ module.exports = {
     if (headerAuth !== allowing) {
       return MiscHelper.response(res, 'You didt have to accesss this API contact us in apphijrah.id', 401)
     } else if (typeof headerSecret === 'undefined') {
-      console.log('Authentication Valid!')
       next()
     } else {
       const bearerToken = headerSecret.split(' ')

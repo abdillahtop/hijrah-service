@@ -205,6 +205,11 @@ module.exports = {
             delete dataUser.salt
             delete dataUser.password
           }
+
+          const comp = {
+            device_id: validate.isEmpty(req.body.deviceId) ? '' : req.body.deviceId
+          }
+          userModels.forgetPassword(comp, req.body.email)
           userModels.updateToken(dataUser.token, dataUser.email)
           const data = {
             token: dataUser.token
@@ -232,6 +237,11 @@ module.exports = {
         delete dataUser.salt
         delete dataUser.password
       }
+
+      const comp = {
+        device_id: validate.isEmpty(req.body.deviceId) ? '' : req.body.deviceId
+      }
+      userModels.forgetPassword(comp, req.body.email)
       userModels.updateToken(dataUser.token, dataUser.email)
       const data = {
         token: dataUser.token
@@ -266,7 +276,10 @@ module.exports = {
 
             delete dataUser.salt
             delete dataUser.password
-            // delete dataUser.token
+            const comp = {
+              device_id: validate.isEmpty(req.body.deviceId) ? '' : req.body.deviceId
+            }
+            userModels.forgetPassword(comp, req.body.email)
             userModels.updateToken(dataUser.token, dataUser.email)
             const data = {
               token: dataUser.token,
