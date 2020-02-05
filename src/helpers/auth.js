@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken')
 const MiscHelper = require('../helpers/helpers')
 const userModel = require('../models/users')
 
+const allowing = process.env.REQUEST_HEADERS_GLOBAL
 const allowedAccess = process.env.REQUEST_HEADERS
 const allowedAccessGmail = process.env.REQUEST_GMAIL_HEADERS
 
@@ -12,6 +13,24 @@ module.exports = {
 
     if (headerAuth !== allowedAccess) {
       return MiscHelper.response(res, null, 401, 'Unauthorized, Need Authentication!')
+    } else if (typeof headerSecret === 'undefined') {
+      console.log('Authentication Valid!')
+      next()
+    } else {
+      const bearerToken = headerSecret.split(' ')
+      const token = bearerToken[1]
+      req.token = token
+      console.log('Token stored!')
+      next()
+    }
+  },
+
+  authInfoGlobal: (req, res, next) => {
+    const headerAuth = req.headers.authorization
+    const headerSecret = req.headers['x-access-token']
+
+    if (headerAuth !== allowing) {
+      return MiscHelper.response(res, 'You didt have to accesss this API contact us in apphijrah.id', 401)
     } else if (typeof headerSecret === 'undefined') {
       console.log('Authentication Valid!')
       next()

@@ -16,16 +16,17 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage })
 
 Route
+  .all('/', Auth.authInfoGlobal)
   .get('/', UserController.getIndex)
   .get('/userDetail', Auth.accesstoken, UserController.userDetail)
-  .get('/verify', UserController.validateCode)
+  .get('/verify', Auth.authInfoGlobal, UserController.validateCode)
   .post('/activation', Auth.accesstoken, UserController.activationUser)
   .post('/change-password', Auth.accesstoken, UserController.changePassword)
-  .post('/register', UserController.register)
+  .post('/register', Auth.authInfoGlobal, UserController.register)
   .post('/register-admin', Auth.authInfo, UserController.registerAdmin)
   .post('/register-gmail', Auth.authGmail, UserController.registerbyGmail)
   .post('/forget-password', Auth.authCode, UserController.forgetPassword)
-  .post('/send-code', UserController.sendCode)
-  .post('/login', UserController.login)
+  .post('/send-code', Auth.authInfoGlobal, UserController.sendCode)
+  .post('/login', Auth.authInfoGlobal, UserController.login)
   .patch('/update-profile', upload.single('image'), Auth.accesstoken, UserController.updateProfile)
 module.exports = Route

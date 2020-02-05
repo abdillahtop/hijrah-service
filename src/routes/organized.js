@@ -18,7 +18,7 @@ const Auth = require('../helpers/auth')
 
 Route
   .get('/', OrganizedController.getIndex)
-  .get('/organizedDetail', Auth.accesstoken, OrganizedController.organizedDetail)
+  .get('/organizedDetail', Auth.authInfoGlobal, Auth.accesstoken, OrganizedController.organizedDetail)
   .get('/list-organized', Auth.accesstoken, OrganizedController.listOrganized)
   .post('/register', upload.single('profile_url'), Auth.accesstoken, OrganizedController.register)
   .post('/activation-organized', Auth.accesstoken, OrganizedController.activeOrganized, sending)
