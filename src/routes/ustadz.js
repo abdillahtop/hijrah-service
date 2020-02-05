@@ -15,9 +15,8 @@ const UstadzController = require('../controllers/ustadz')
 const Auth = require('../helpers/auth')
 
 Route
-  .all('/', Auth.authInfoGlobal)
   .get('/', UstadzController.getIndex)
-  .get('/list-ustadz', Auth.authInfoGlobal, UstadzController.getUstadzByKajian)
+  .get('/list-ustadz', UstadzController.getUstadzByKajian)
   .post('/add-ustadz', upload.single('image'), Auth.accesstoken, UstadzController.addUstadz)
   .delete('/', Auth.accesstoken, UstadzController.deleteUstadz)
 module.exports = Route

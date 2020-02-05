@@ -69,7 +69,6 @@ module.exports = {
     if (headerAuth !== hello[0].activation_code) {
       return MiscHelper.response(res, null, 401, 'Unauthorized, Need Authentication!')
     } else if (typeof headerSecret === 'undefined') {
-      console.log('Authentication Valid!')
       next()
     } else {
       const bearerToken = headerSecret.split(' ')
