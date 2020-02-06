@@ -346,7 +346,7 @@ module.exports = {
           service: 'gmail',
           auth: {
             user: 'helpdesk.hijrahapp@gmail.com',
-            pass: 'hijrahapp1234'
+            pass: '@Hijrahapp1234'
           }
         })
         const mailOptions = {
