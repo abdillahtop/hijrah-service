@@ -11,11 +11,13 @@ module.exports = {
   },
 
   getVersion: (req, res) => {
-    versionModel.getVersion((err, result) => {
-      if (err) console.log(err)
-
-      MiscHelper.response(res, result, 200)
-    })
+    versionModel.getVersion()
+      .then(result => {
+        MiscHelper.response(res, result, 200)
+      })
+      .catch(() => {
+        MiscHelper.response(res, 'Bad request', 400)
+      })
   },
 
   updateVersion: async (req, res) => {

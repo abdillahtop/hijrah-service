@@ -6,5 +6,5 @@ const Auth = require('../helpers/auth')
 
 Route
   .get('/', versionCOntroller.getVersion)
-  .post('/add-ustadz', Auth.accesstoken, versionCOntroller.updateVersion)
+  .post('/update-version', Auth.accesstoken, versionCOntroller.updateVersion)
 module.exports = Route
