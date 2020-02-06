@@ -19,7 +19,7 @@ Route
   .get('/', UserController.getIndex)
   .get('/userDetail', Auth.accesstoken, UserController.userDetail)
   .get('/verify', UserController.validateCode)
-  .post('/activation', UserController.activationUser)
+  .post('/activation', Auth.accesstoken, UserController.activationUser)
   .post('/change-password', UserController.changePassword)
   .post('/register', UserController.register)
   .post('/register-admin', Auth.authInfo, UserController.registerAdmin)
@@ -27,5 +27,5 @@ Route
   .post('/forget-password', Auth.authCode, UserController.forgetPassword)
   .post('/send-code', UserController.sendCode)
   .post('/login', UserController.login)
-  .patch('/update-profile', upload.single('image'), UserController.updateProfile)
+  .patch('/update-profile', upload.single('image'), Auth.accesstoken, UserController.updateProfile)
 module.exports = Route
