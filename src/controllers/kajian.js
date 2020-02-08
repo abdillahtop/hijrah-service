@@ -11,7 +11,6 @@ const dateFormat = require('dateformat')
 
 module.exports = {
   getIndex: (req, res) => {
-    console.log(new Date().getTime())
     return res.json({
       code: 200,
       message: 'Server Running well, ready to use'
@@ -62,7 +61,7 @@ module.exports = {
         location: req.body.location,
         startDate: req.body.startDate,
         endDate: req.body.endDate,
-        endDateFormat: req.body.timeEnd == 'Selesai' ? new Date(date + 'T23:59').getTime() : new Date(date + 'T' + req.body.timeEnd).getTime(),
+        endDateFormat: req.body.timeEnd == 'Selesai' ? new Date(new Date(date + 'T23:59').toJSON()).getTime() : new Date(new Date(date + 'T' + req.body.timeEnd).toJSON()).getTime(),
         timeStart: req.body.timeStart,
         timeEnd: req.body.timeEnd,
         description: req.body.description,
@@ -166,7 +165,6 @@ module.exports = {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
     const dateNow = new Date().getTime()
-    console.log(dateNow)
     kajianModels
       .getKajianAll(dateNow, limit, page)
       .then(result => {
@@ -191,7 +189,6 @@ module.exports = {
     const dateNow = new Date().getTime()
     const latitude = await req.query.latitude
     const longitude = await req.query.longitude
-    console.log(dateNow)
     kajianModels
       .getKajianAllNearby(dateNow, latitude, longitude, limit, page)
       .then(result => {
@@ -216,7 +213,6 @@ module.exports = {
     const dateNow = new Date().getTime()
     const latitude = await req.query.latitude
     const longitude = await req.query.longitude
-    console.log(dateNow)
     kajianModels
       .getKajianAllPopuler(dateNow, latitude, longitude, limit, page)
       .then(result => {
@@ -246,7 +242,6 @@ module.exports = {
     if (checkCategory[0] === undefined) {
       MiscHelper.response(res, 'Category not found', 404)
     } else {
-      console.log(dateNow)
       kajianModels
         .getKajianAllbyCategory(dateNow, checkCategory[0].name, limit, page)
         .then(result => {
@@ -351,7 +346,6 @@ module.exports = {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
     const dateNow = new Date().getTime()
-    console.log(dateNow)
     const checkOrganized = await organizedModels.getOrganizer(
       req.user_id
     )
@@ -392,7 +386,6 @@ module.exports = {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
     const dateNow = new Date().getTime()
-    console.log(dateNow)
     if (catId === '') {
       kajianModels
         .findKajian(dateNow, latitude, longitude, search, limit, page)
@@ -449,7 +442,6 @@ module.exports = {
     if (checkMemberKajian[0] === undefined) {
       MiscHelper.response(res, 'you not join in this kajian', 401)
     } else {
-      console.log(JSON.stringify(memberKajian[0].length))
       kajianModels
         .unjoinKajian(req.user_id, memberKajian[0].length - 1, kajianId)
         .then(() => {
@@ -486,7 +478,6 @@ module.exports = {
               })
           }
         })
-        console.log(status)
         if (status) {
           MiscHelper.response(res, 'Kajian not found', 204)
         }
@@ -499,12 +490,10 @@ module.exports = {
     const checkUser = await userModels.getUser(
       req.user_id
     )
-    console.log(req.user_id)
     if (checkUser[0] === undefined) {
       MiscHelper.response(res, 'User not found', 404)
     } else {
       const checkMemberKajian = await kajianModels.checkMemberKajian(kajianId, req.user_id)
-      console.log(JSON.stringify(checkMemberKajian))
       if (checkMemberKajian[0] === undefined) {
         MiscHelper.response(res, 'Kajian not found', 204)
       } else {
