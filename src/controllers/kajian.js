@@ -288,13 +288,13 @@ module.exports = {
       const data = {
         registration_id: uuidv4(),
         user_id: req.user_id,
-        kajian_id: req.body.kajianId,
+        kajian_id: req.params.kajianId,
         image: checkUser[0].profile_url,
         name: checkUser[0].name,
         register_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss')
       }
       kajianModels
-        .addMemberKajian(data, memberKajian[0] == 0 ? 1 : memberKajian[0].length + 1, req.body.kajianId)
+        .addMemberKajian(data, memberKajian[0] == 0 ? 1 : memberKajian[0].length + 1, req.params.kajianId)
         .then(() => {
           MiscHelper.response(res, 'Member Kajian has been successfull', 200)
         })
@@ -308,7 +308,6 @@ module.exports = {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
     const kajianId = await req.query.kajianId
-    console.log(dateNow)
     kajianModels
       .memberKajianAll(kajianId, limit, page)
       .then(result => {
