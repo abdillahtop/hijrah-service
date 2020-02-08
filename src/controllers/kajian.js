@@ -61,7 +61,7 @@ module.exports = {
         location: req.body.location,
         startDate: req.body.startDate,
         endDate: req.body.endDate,
-        endDateFormat: req.body.timeEnd == 'Selesai' ? new Date(new Date(date + 'T' + '23:59').toJSON()).getTime() : new Date(new Date(date + 'T' + req.body.timeEnd).toJSON()).getTime(),
+        endDateFormat: req.body.timeEnd == 'Selesai' ? new Date(date + 'T' + '23:59').toJSON() : new Date(date + 'T' + req.body.timeEnd).toJSON(),
         timeStart: req.body.timeStart,
         timeEnd: req.body.timeEnd,
         description: req.body.description,
@@ -164,7 +164,8 @@ module.exports = {
   getAllKajian: async (req, res) => {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
-    const dateNow = new Date().getTime()
+    const dateNow = new Date().toJSON()
+    console.log(dateNow)
     kajianModels
       .getKajianAll(dateNow, limit, page)
       .then(result => {
@@ -186,7 +187,7 @@ module.exports = {
   getAllKajianNearby: async (req, res) => {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
-    const dateNow = new Date().getTime()
+    const dateNow = new Date().toJSON()
     const latitude = await req.query.latitude
     const longitude = await req.query.longitude
     kajianModels
@@ -210,7 +211,7 @@ module.exports = {
   getAllKajianPopuler: async (req, res) => {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
-    const dateNow = new Date().getTime()
+    const dateNow = new Date().toJSON()
     const latitude = await req.query.latitude
     const longitude = await req.query.longitude
     kajianModels
@@ -237,7 +238,7 @@ module.exports = {
     )
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
-    const dateNow = new Date().getTime()
+    const dateNow = new Date().toJSON()
 
     if (checkCategory[0] === undefined) {
       MiscHelper.response(res, 'Category not found', 404)
@@ -345,7 +346,7 @@ module.exports = {
   getKajianbyOrganized: async (req, res) => {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
-    const dateNow = new Date().getTime()
+    const dateNow = new Date().toJSON()
     const checkOrganized = await organizedModels.getOrganizer(
       req.user_id
     )
@@ -385,7 +386,7 @@ module.exports = {
     const longitude = await req.query.longitude
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
-    const dateNow = new Date().getTime()
+    const dateNow = new Date().toJSON()
     if (catId === '') {
       kajianModels
         .findKajian(dateNow, latitude, longitude, search, limit, page)
