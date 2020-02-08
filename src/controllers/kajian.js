@@ -527,6 +527,9 @@ module.exports = {
           const listMember = []
           const listUstadzs = []
           const detailKajian = model.detailKajian()
+          detailKajian.kajian_id = req.params.kajianId
+          detailKajian.adminKajianName = checkKajian[0].adminKajianName
+          detailKajian.logoOrganized = checkOrganized[0].profile_url
           detailKajian.title = kajian.title
           detailKajian.categoryName = kajian.categoryName
           detailKajian.image = kajian.image
@@ -571,7 +574,7 @@ module.exports = {
           detailKajian.ustadz = listUstadzs[0]
           detailKajian.payment = kajian.payment
           detailEvent.push(detailKajian)
-          MiscHelper.response(res, detailEvent, 200, 'Get Detail Kajian Success')
+          MiscHelper.response(res, detailEvent[0], 200, 'Get Detail Kajian Success')
         }
       }
     } else {
@@ -590,6 +593,9 @@ module.exports = {
           const listMember = []
           const listUstadzs = []
           const detailKajian = model.detailKajian()
+          detailKajian.kajian_id = req.params.kajianId
+          detailKajian.adminKajianName = checkKajian[0].adminKajianName
+          detailKajian.logoOrganized = checkOrganized[0].profile_url
           detailKajian.title = kajian.title
           detailKajian.image = kajian.image
           detailKajian.categoryName = kajian.categoryName
@@ -635,7 +641,8 @@ module.exports = {
           detailKajian.payment = kajian.payment
           detailKajian.ustadz = listUstadzs[0]
           detailEvent.push(detailKajian)
-          MiscHelper.response(res, detailEvent, 200, 'Get Detail Kajian Success')
+          const data = detailEvent[0]
+          MiscHelper.response(res, data, 200, 'Get Detail Kajian Success')
         }
       }
     }
