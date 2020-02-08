@@ -5,6 +5,7 @@ const ustadzModels = require('../models/ustadz')
 const categoryModels = require('../models/category')
 const MiscHelper = require('../helpers/helpers')
 const cloudinary = require('cloudinary')
+const date = require('dateformat')
 const uuidv4 = require('uuid/v4')
 const model = require('../helpers/model')
 const dateFormat = require('dateformat')
@@ -78,6 +79,8 @@ module.exports = {
         count_member: 0,
         payment: req.body.payment
       }
+      console.log(new Date())
+      console.log(data.endDateFormat)
       kajianModels
         .addKajian(data)
         .then(() => {
