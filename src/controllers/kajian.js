@@ -78,6 +78,7 @@ module.exports = {
         count_member: 0,
         payment: req.body.payment
       }
+      console.log('Time' + data.endDateFormat)
       kajianModels
         .addKajian(data)
         .then(() => {
