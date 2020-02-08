@@ -5,7 +5,6 @@ const ustadzModels = require('../models/ustadz')
 const categoryModels = require('../models/category')
 const MiscHelper = require('../helpers/helpers')
 const cloudinary = require('cloudinary')
-const date = require('dateformat')
 const uuidv4 = require('uuid/v4')
 const model = require('../helpers/model')
 const dateFormat = require('dateformat')
@@ -62,7 +61,7 @@ module.exports = {
         location: req.body.location,
         startDate: req.body.startDate,
         endDate: req.body.endDate,
-        endDateFormat: req.body.timeEnd == 'Selesai' ? new Date(req.body.timeEnd + 'T' + '23:59:00').getTime() : new Date(date + 'T' + req.body.timeEnd).getTime(),
+        endDateFormat: req.body.timeEnd == 'Selesai' ? new Date(date + 'T23:59').getTime() : new Date(date + 'T' + req.body.timeEnd).getTime(),
         timeStart: req.body.timeStart,
         timeEnd: req.body.timeEnd,
         description: req.body.description,
@@ -267,13 +266,13 @@ module.exports = {
   },
 
   addMemberKajian: async (req, res) => {
-    const checkKajian = await kajianModels.checkKajian(req.body.kajianId)
+    const checkKajian = await kajianModels.checkKajian(req.params.kajianId)
     const checkUser = await userModels.userDetail(req.user_id)
     const checkMember = await kajianModels.checkMemberKajian(
-      req.body.kajianId,
+      req.params.kajianId,
       req.user_id
     )
-    const memberKajian = await kajianModels.memberKajian(req.body.kajianId)
+    const memberKajian = await kajianModels.memberKajian(req.params.kajianId)
     if (checkKajian[0] === undefined) {
       MiscHelper.response(res, 'Kajian not found', 404)
     } else if (checkUser[0] === undefined) {
@@ -548,9 +547,10 @@ module.exports = {
           } else {
             listMember.push(memberKajian[0])
           }
-          detailKajian.attended = listMember[0]
+          const attend = listMember[0]
+          detailKajian.attended = attend.slice(0, 3)
           if (memberKajian[1] < 50) {
-            const attent = memberKajian[1].toString()
+            const attent = memberKajian[1].toString() - 3
             detailKajian.countAttended = attent
           } else if (memberKajian[1] < 100) {
             detailKajian.countAttended = '50+'
