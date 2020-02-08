@@ -11,6 +11,7 @@ const dateFormat = require('dateformat')
 
 module.exports = {
   getIndex: (req, res) => {
+    console.log(new Date().getTime())
     return res.json({
       code: 200,
       message: 'Server Running well, ready to use'
@@ -165,6 +166,7 @@ module.exports = {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
     const dateNow = new Date().getTime()
+    console.log(dateNow)
     kajianModels
       .getKajianAll(dateNow, limit, page)
       .then(result => {
@@ -189,6 +191,7 @@ module.exports = {
     const dateNow = new Date().getTime()
     const latitude = await req.query.latitude
     const longitude = await req.query.longitude
+    console.log(dateNow)
     kajianModels
       .getKajianAllNearby(dateNow, latitude, longitude, limit, page)
       .then(result => {
@@ -213,6 +216,7 @@ module.exports = {
     const dateNow = new Date().getTime()
     const latitude = await req.query.latitude
     const longitude = await req.query.longitude
+    console.log(dateNow)
     kajianModels
       .getKajianAllPopuler(dateNow, latitude, longitude, limit, page)
       .then(result => {
@@ -242,6 +246,7 @@ module.exports = {
     if (checkCategory[0] === undefined) {
       MiscHelper.response(res, 'Category not found', 404)
     } else {
+      console.log(dateNow)
       kajianModels
         .getKajianAllbyCategory(dateNow, checkCategory[0].name, limit, page)
         .then(result => {
@@ -303,6 +308,7 @@ module.exports = {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
     const kajianId = await req.query.kajianId
+    console.log(dateNow)
     kajianModels
       .memberKajianAll(kajianId, limit, page)
       .then(result => {
@@ -346,6 +352,7 @@ module.exports = {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
     const dateNow = new Date().getTime()
+    console.log(dateNow)
     const checkOrganized = await organizedModels.getOrganizer(
       req.user_id
     )
@@ -386,6 +393,7 @@ module.exports = {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
     const dateNow = new Date().getTime()
+    console.log(dateNow)
     if (catId === '') {
       kajianModels
         .findKajian(dateNow, latitude, longitude, search, limit, page)
