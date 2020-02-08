@@ -61,7 +61,7 @@ module.exports = {
         location: req.body.location,
         startDate: req.body.startDate,
         endDate: req.body.endDate,
-        endDateFormat: req.body.timeEnd == 'Selesai' ? date : date + 'T' + req.body.timeEnd,
+        endDateFormat: req.body.timeEnd == 'Selesai' ? date + 'T' + '23:59:00' : date + 'T' + req.body.timeEnd,
         timeStart: req.body.timeStart,
         timeEnd: req.body.timeEnd,
         description: req.body.description,
