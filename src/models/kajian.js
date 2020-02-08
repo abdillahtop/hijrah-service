@@ -1,4 +1,4 @@
-const connection = require('../configs/database/mysql/db')
+const connection = require('../configs/database/mysql/db.js')
 
 module.exports = {
   addKajian: (data) => {
@@ -16,7 +16,7 @@ module.exports = {
   getKajianAll: (dateNow, limit, page) => {
     const offset = (limit * page) - limit
     return new Promise((resolve, reject) => {
-      connection.query('UPDATE kajian SET active = ? WHERE endDate <= ?', [0, dateNow], async (err1, result1) => {
+      connection.query('UPDATE kajian SET active = ? WHERE endDateFormat <= ?', [0, dateNow], async (err1, result1) => {
         if (!err1) {
           await connection.query('SELECT count(*) as total FROM kajian WHERE isUstadz = 1 AND active = 1', async (err2, result2) => {
             if (!err2) {
@@ -43,7 +43,7 @@ module.exports = {
   getKajianAllNearby: (dateNow, latitude, longitude, limit, page) => {
     const offset = (limit * page) - limit
     return new Promise((resolve, reject) => {
-      connection.query('UPDATE kajian SET active = ? WHERE endDate <= ?', [0, dateNow], async (err1, result1) => {
+      connection.query('UPDATE kajian SET active = ? WHERE endDateFormat <= ?', [0, dateNow], async (err1, result1) => {
         if (!err1) {
           await connection.query('SELECT count(*) as total FROM kajian WHERE isUstadz = 1 AND active = 1', async (err2, result2) => {
             if (!err2) {
@@ -70,7 +70,7 @@ module.exports = {
   getKajianAllPopuler: (dateNow, latitude, longitude, limit, page) => {
     const offset = (limit * page) - limit
     return new Promise((resolve, reject) => {
-      connection.query('UPDATE kajian SET active = ? WHERE endDate <= ?', [0, dateNow], async (err1, result1) => {
+      connection.query('UPDATE kajian SET active = ? WHERE endDateFormat <= ?', [0, dateNow], async (err1, result1) => {
         if (!err1) {
           await connection.query('SELECT count(*) as total FROM kajian WHERE isUstadz = 1 AND active = 1', async (err2, result2) => {
             if (!err2) {
@@ -207,7 +207,7 @@ module.exports = {
   findKajian: (dateNow, latitude, longitude, search, limit, page) => {
     const offset = (limit * page) - limit
     return new Promise((resolve, reject) => {
-      connection.query('UPDATE kajian SET active = ? WHERE endDate <= ?', [0, dateNow], async (err1, result1) => {
+      connection.query('UPDATE kajian SET active = ? WHERE endDateFormat <= ?', [0, dateNow], async (err1, result1) => {
         if (!err1) {
           const find = `%${search}%`
           await connection.query('SELECT count(*) as total FROM kajian WHERE title LIKE ? AND isUstadz = 1 AND active = 1', find, async (err2, result2) => {
@@ -236,7 +236,7 @@ module.exports = {
   findKajianByCat: (dateNow, catId, latitude, longitude, search, limit, page) => {
     const offset = (limit * page) - limit
     return new Promise((resolve, reject) => {
-      connection.query('UPDATE kajian SET active = ? WHERE endDate <= ?', [0, dateNow], async (err1, result1) => {
+      connection.query('UPDATE kajian SET active = ? WHERE endDateFormat <= ?', [0, dateNow], async (err1, result1) => {
         if (!err1) {
           const find = `%${search}%`
           await connection.query('SELECT count(*) as total FROM kajian WHERE title LIKE ? AND isUstadz = 1 AND active = 1 AND categoryName = ?', [find, catId], async (err2, result2) => {
@@ -356,7 +356,7 @@ module.exports = {
   getKajinbyOrganized: (dateNow, organizedId, categoryName, limit, page) => {
     const offset = (limit * page) - limit
     return new Promise((resolve, reject) => {
-      connection.query('UPDATE kajian SET active = ? WHERE endDate <= ?', [0, dateNow], async (err1, result1) => {
+      connection.query('UPDATE kajian SET active = ? WHERE endDateFormat <= ?', [0, dateNow], async (err1, result1) => {
         if (!err1) {
           await connection.query('SELECT count(*) as total FROM kajian WHERE isUstadz = 1 AND categoryName = ? AND adminKajianId = ?', [categoryName, organizedId], async (err2, result2) => {
             if (!err2) {
