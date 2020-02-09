@@ -301,7 +301,7 @@ module.exports = {
 
   getKajianByUser: (userId, active) => {
     return new Promise((resolve, reject) => {
-      connection.query('SELECT kajian.kajian_id, kajian.title, kajian.image, kajian.categoryName, kajian.startDate, kajian.endDate, kajian.timeStart, kajian.timeEnd, kajian.location, kajian.payment FROM kajian JOIN member_kajian ON kajian.kajian_id = member_kajian.kajian_id WHERE member_kajian.user_id = ? AND kajian.active = ?', [userId, active], async (err, result) => {
+      connection.query('SELECT kajian.kajian_id,kajian.adminKajianId, kajian.adminKajianName, kajian.title, kajian.image, kajian.categoryName, kajian.startDate, kajian.endDate, kajian.timeStart, kajian.timeEnd,kajian.description, kajian.linkVideo,kajian.latitude, kajian.longitude, kajian.locationMap,kajian.isUstadz, kajian.active, kajian.count_member, kajian.publishAt, kajian.payment  FROM kajian JOIN member_kajian ON kajian.kajian_id = member_kajian.kajian_id WHERE member_kajian.user_id = ? AND kajian.active = ?', [userId, active], async (err, result) => {
         if (!err) {
           await resolve(result)
         } else {
@@ -362,7 +362,7 @@ module.exports = {
             if (!err2) {
               const totalData = result2[0].total
               const totalPage = Math.ceil(totalData / limit)
-              await connection.query('SELECT kajian.kajian_id, kajian.title,image, kajian.categoryName, kajian.startDate, kajian.endDate, timeStart, timeEnd, kajian.location, kajian.payment FROM kajian JOIN organized ON kajian.adminKajianId = organized.organized_id WHERE organized.organized_id = ? AND categoryName = ? AND isUstadz = 1 ORDER BY kajian.startDate desc LIMIT ? OFFSET ?', [organizedId, categoryName, limit, offset], (err3, results) => {
+              await connection.query('SELECT kajian.kajian_id,kajian.adminKajianId, kajian.adminKajianName, kajian.title, kajian.image, kajian.categoryName, kajian.startDate, kajian.endDate, kajian.timeStart, kajian.timeEnd,kajian.description, kajian.linkVideo,kajian.latitude, kajian.longitude, kajian.locationMap,kajian.isUstadz, kajian.active, kajian.count_member, kajian.publishAt, kajian.payment  FROM kajian JOIN organized ON kajian.adminKajianId = organized.organized_id WHERE organized.organized_id = ? AND categoryName = ? AND isUstadz = 1 ORDER BY kajian.startDate desc LIMIT ? OFFSET ?', [organizedId, categoryName, limit, offset], (err3, results) => {
                 if (!err3) {
                   resolve([results, totalData, page, totalPage])
                 } else {
