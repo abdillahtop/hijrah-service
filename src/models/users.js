@@ -1,4 +1,4 @@
-const connection = require('../configs/database/mysql/db')
+const connection = require('../configs/database/mysql/db.js')
 
 module.exports = {
   getUsers: (callback) => {

@@ -147,6 +147,7 @@ module.exports = {
         publishAt: checkKajian[0].publishAt,
         active: checkKajian[0].active,
         isUstadz: checkKajian[0].isUstadz,
+        payment: req.body.patment,
         image: await geturl(),
         count_member: checkKajian[0].count_member
       }
