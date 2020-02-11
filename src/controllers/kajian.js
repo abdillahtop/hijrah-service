@@ -561,7 +561,7 @@ module.exports = {
           detailKajian.attended = attend.slice(0, 3)
           if (memberKajian[1] < 3) {
             const attent = memberKajian[1].toString()
-            detailKajian.countAttended = attent
+            detailKajian.countAttended = attent - attent
           } else if (memberKajian[1] < 50) {
             const attent = memberKajian[1].toString() - 3
             detailKajian.countAttended = attent
