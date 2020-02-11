@@ -286,7 +286,7 @@ module.exports = {
     } else if (checkUser[0] === undefined) {
       MiscHelper.response(res, 'User not found', 404)
     } else if (checkMember[0] !== undefined) {
-      MiscHelper.response(res, 'User has been Join Kajian', 201)
+      MiscHelper.response(res, 'User has been Join Kajian', 409)
     } else {
       const data = {
         registration_id: uuidv4(),
