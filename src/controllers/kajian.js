@@ -6,7 +6,7 @@ const categoryModels = require('../models/category')
 const MiscHelper = require('../helpers/helpers')
 const cloudinary = require('cloudinary')
 const uuidv4 = require('uuid/v4')
-const dates = require('dateformat')
+// const dates = require('dateformat')
 const model = require('../helpers/model')
 const dateFormat = require('dateformat')
 const moment = require('moment')
@@ -137,7 +137,7 @@ module.exports = {
         endDate: req.body.endDate,
         timeStart: req.body.timeStart,
         timeEnd: req.body.timeEnd,
-        endDateFormat: req.body.timeEnd == 'Selesai' ? date : date + 'T' + req.body.timeEnd,
+        endDateFormat: req.body.timeEnd == 'Selesai' ? moment(date + 'T' + '23:59').format() : moment(date + 'T' + req.body.timeEnd).format(),
         description: req.body.description,
         title: req.body.title,
         linkVideo: req.body.linkVideo,
@@ -167,7 +167,8 @@ module.exports = {
   getAllKajian: async (req, res) => {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
-    const dateNow = dates(new Date().toLocaleString(), 'isoDateTime')
+    const tzoffset = (new Date()).getTimezoneOffset() * 60000 // offset in milliseconds
+    const dateNow = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1)
     console.log(dateNow)
     kajianModels
       .getKajianAll(dateNow, limit, page)
@@ -190,7 +191,8 @@ module.exports = {
   getAllKajianNearby: async (req, res) => {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
-    const dateNow = dates(new Date().toLocaleString(), 'isoDateTime')
+    const tzoffset = (new Date()).getTimezoneOffset() * 60000 // offset in milliseconds
+    const dateNow = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1)
     const latitude = await req.query.latitude
     const longitude = await req.query.longitude
     kajianModels
@@ -214,7 +216,8 @@ module.exports = {
   getAllKajianPopuler: async (req, res) => {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
-    const dateNow = dates(new Date().toLocaleString(), 'isoDateTime')
+    const tzoffset = (new Date()).getTimezoneOffset() * 60000 // offset in milliseconds
+    const dateNow = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1)
     const latitude = await req.query.latitude
     const longitude = await req.query.longitude
     kajianModels
@@ -241,7 +244,8 @@ module.exports = {
     )
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
-    const dateNow = dates(new Date().toLocaleString(), 'isoDateTime')
+    const tzoffset = (new Date()).getTimezoneOffset() * 60000 // offset in milliseconds
+    const dateNow = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1)
 
     if (checkCategory[0] === undefined) {
       MiscHelper.response(res, 'Category not found', 404)
@@ -349,7 +353,8 @@ module.exports = {
   getKajianbyOrganized: async (req, res) => {
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
-    const dateNow = dates(new Date().toLocaleString(), 'isoDateTime')
+    const tzoffset = (new Date()).getTimezoneOffset() * 60000 // offset in milliseconds
+    const dateNow = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1)
     const checkOrganized = await organizedModels.getOrganizer(
       req.user_id
     )
@@ -389,7 +394,8 @@ module.exports = {
     const longitude = await req.query.longitude
     const limit = await parseInt(req.query.limit)
     const page = await parseInt(req.query.page)
-    const dateNow = dates(new Date().toLocaleString(), 'isoDateTime')
+    const tzoffset = (new Date()).getTimezoneOffset() * 60000 // offset in milliseconds
+    const dateNow = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1)
     if (catId === '') {
       kajianModels
         .findKajian(dateNow, latitude, longitude, search, limit, page)
