@@ -538,6 +538,7 @@ module.exports = {
           detailKajian.kajianId = kajian.kajianId
           detailKajian.linkVideo = kajian.linkVideo
           detailKajian.startDate = kajian.startDate
+          detailKajian.phoneNumber = checkOrganized[0].phone_number
           detailKajian.endDate = kajian.endDate
           detailKajian.timeStart = kajian.timeStart
           detailKajian.timeEnd = kajian.timeEnd
