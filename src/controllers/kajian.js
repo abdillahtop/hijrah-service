@@ -623,7 +623,7 @@ module.exports = {
           } else {
             listMember.push(memberKajian[0])
           }
-          detailKajian.attended = listMember[0]
+          detailKajian.attended = attend.slice(0, 3)
           if (memberKajian[1] < 50) {
             detailKajian.countAttended = 0
           } else if (memberKajian[1] < 100) {
