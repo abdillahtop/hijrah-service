@@ -128,7 +128,7 @@ module.exports = {
     } else {
       const date = dateFormat(req.body.endDate, 'yyyy-mm-dd')
       const data = {
-        kajian_id: checkKajian[0].kajian_id,
+        kajian_id: req.params.kajianId,
         adminKajianId: checkOrganized[0].organized_id,
         adminKajianName: req.body.adminNameKajian,
         categoryName: checkCategory[0].name,
@@ -148,7 +148,7 @@ module.exports = {
         publishAt: checkKajian[0].publishAt,
         active: checkKajian[0].active,
         isUstadz: checkKajian[0].isUstadz,
-        payment: req.body.patment,
+        payment: req.body.payment,
         image: await geturl(),
         count_member: checkKajian[0].count_member
       }
