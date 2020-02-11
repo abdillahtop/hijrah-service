@@ -18,11 +18,11 @@ module.exports = {
     return new Promise((resolve, reject) => {
       connection.query('UPDATE kajian SET active = ? WHERE endDateFormat <= ?', [0, dateNow], async (err1, result1) => {
         if (!err1) {
-          await connection.query('SELECT count(*) as total FROM kajian WHERE isUstadz = 1 AND active = 1', async (err2, result2) => {
+          await connection.query('SELECT count(*) as total FROM kajian WHERE active = 1', async (err2, result2) => {
             if (!err2) {
               const totalData = result2[0].total
               const totalPage = Math.ceil(totalData / limit)
-              await connection.query('SELECT * FROM kajian WHERE isUstadz = 1 AND active = 1 ORDER BY startDate desc LIMIT ? OFFSET ?', [limit, offset], (err3, results) => {
+              await connection.query('SELECT * FROM kajian WHERE active = 1 ORDER BY startDate desc LIMIT ? OFFSET ?', [limit, offset], (err3, results) => {
                 if (!err3) {
                   resolve([results, totalData, page, totalPage])
                 } else {
@@ -45,11 +45,11 @@ module.exports = {
     return new Promise((resolve, reject) => {
       connection.query('UPDATE kajian SET active = ? WHERE endDateFormat <= ?', [0, dateNow], async (err1, result1) => {
         if (!err1) {
-          await connection.query('SELECT count(*) as total FROM kajian WHERE isUstadz = 1 AND active = 1', async (err2, result2) => {
+          await connection.query('SELECT count(*) as total FROM kajian WHERE active = 1', async (err2, result2) => {
             if (!err2) {
               const totalData = result2[0].total
               const totalPage = Math.ceil(totalData / limit)
-              await connection.query('SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ? ) ) * cos( radians( ? ) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians( ? )) ) ) AS distance FROM kajian WHERE isUstadz = 1 AND active = 1 HAVING distance < 50 ORDER BY distance LIMIT ? OFFSET ?', [latitude, longitude, latitude, limit, offset], (err3, results) => {
+              await connection.query('SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ? ) ) * cos( radians( ? ) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians( ? )) ) ) AS distance FROM kajian WHERE active = 1 HAVING distance < 50 ORDER BY distance LIMIT ? OFFSET ?', [latitude, longitude, latitude, limit, offset], (err3, results) => {
                 if (!err3) {
                   resolve([results, totalData, page, totalPage])
                 } else {
@@ -72,11 +72,11 @@ module.exports = {
     return new Promise((resolve, reject) => {
       connection.query('UPDATE kajian SET active = ? WHERE endDateFormat <= ?', [0, dateNow], async (err1, result1) => {
         if (!err1) {
-          await connection.query('SELECT count(*) as total FROM kajian WHERE isUstadz = 1 AND active = 1', async (err2, result2) => {
+          await connection.query('SELECT count(*) as total FROM kajian WHERE active = 1', async (err2, result2) => {
             if (!err2) {
               const totalData = result2[0].total
               const totalPage = Math.ceil(totalData / limit)
-              await connection.query('SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ? ) ) * cos( radians( ? ) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians( ? )) ) ) AS distance FROM kajian WHERE isUstadz = 1 AND active = 1 HAVING distance < 1000 ORDER BY count_member desc LIMIT ? OFFSET ?', [latitude, longitude, latitude, limit, offset], (err3, results) => {
+              await connection.query('SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ? ) ) * cos( radians( ? ) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians( ? )) ) ) AS distance FROM kajian WHERE active = 1 HAVING distance < 1000 ORDER BY count_member desc LIMIT ? OFFSET ?', [latitude, longitude, latitude, limit, offset], (err3, results) => {
                 if (!err3) {
                   resolve([results, totalData, page, totalPage])
                 } else {
@@ -99,11 +99,11 @@ module.exports = {
     return new Promise((resolve, reject) => {
       connection.query('UPDATE kajian SET active = ? WHERE endDateFormat <= ?', [0, dateNow], async (err1, result1) => {
         if (!err1) {
-          await connection.query('SELECT count(*) as total FROM kajian WHERE categoryName = ? AND isUstadz = 1 AND active = 1', categoryName, async (err2, result2) => {
+          await connection.query('SELECT count(*) as total FROM kajian WHERE categoryName = ? AND active = 1', categoryName, async (err2, result2) => {
             if (!err2) {
               const totalData = result2[0].total
               const totalPage = Math.ceil(totalData / limit)
-              await connection.query('SELECT * FROM kajian WHERE isUstadz = 1 AND categoryName = ? AND active = 1 ORDER BY startDate desc LIMIT ? OFFSET ?', [categoryName, limit, offset], (err3, results) => {
+              await connection.query('SELECT * FROM kajian WHERE categoryName = ? AND active = 1 ORDER BY startDate desc LIMIT ? OFFSET ?', [categoryName, limit, offset], (err3, results) => {
                 if (!err3) {
                   resolve([results, totalData, page, totalPage])
                 } else {
@@ -194,7 +194,7 @@ module.exports = {
   // findKajian: (latitude, longitude, search) => {
   //   return new Promise((resolve, reject) => {
   //     const find = `%${search}%`
-  //     connection.query('SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ? ) ) * cos( radians( ? ) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians( ? )) ) ) AS distance FROM kajian WHERE title LIKE ? AND isUstadz = 1 AND active = 1 HAVING distance < 1000 ORDER BY distance LIMIT 20 ', [latitude, longitude, latitude, find], (err, result) => {
+  //     connection.query('SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ? ) ) * cos( radians( ? ) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians( ? )) ) ) AS distance FROM kajian WHERE title LIKE ?  active = 1 HAVING distance < 1000 ORDER BY distance LIMIT 20 ', [latitude, longitude, latitude, find], (err, result) => {
   //       if (!err) {
   //         resolve(result)
   //       } else {
@@ -210,12 +210,12 @@ module.exports = {
       connection.query('UPDATE kajian SET active = ? WHERE endDateFormat <= ?', [0, dateNow], async (err1, result1) => {
         if (!err1) {
           const find = `%${search}%`
-          await connection.query('SELECT count(*) as total FROM kajian WHERE title LIKE ? AND isUstadz = 1 AND active = 1', find, async (err2, result2) => {
+          await connection.query('SELECT count(*) as total FROM kajian WHERE title LIKE ? AND active = 1', find, async (err2, result2) => {
             if (!err2) {
               const find = `%${search}%`
               const totalData = result2[0].total
               const totalPage = Math.ceil(totalData / limit)
-              await connection.query('SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ? ) ) * cos( radians( ? ) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians( ? )) ) ) AS distance FROM kajian WHERE title LIKE ? AND isUstadz = 1 AND active = 1 HAVING distance < 1000 ORDER BY distance LIMIT ? OFFSET ?', [latitude, longitude, latitude, find, limit, offset], (err3, results) => {
+              await connection.query('SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ? ) ) * cos( radians( ? ) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians( ? )) ) ) AS distance FROM kajian WHERE title LIKE ? AND active = 1 HAVING distance < 1000 ORDER BY distance LIMIT ? OFFSET ?', [latitude, longitude, latitude, find, limit, offset], (err3, results) => {
                 if (!err3) {
                   resolve([results, totalData, page, totalPage])
                 } else {
@@ -239,12 +239,12 @@ module.exports = {
       connection.query('UPDATE kajian SET active = ? WHERE endDateFormat <= ?', [0, dateNow], async (err1, result1) => {
         if (!err1) {
           const find = `%${search}%`
-          await connection.query('SELECT count(*) as total FROM kajian WHERE title LIKE ? AND isUstadz = 1 AND active = 1 AND categoryName = ?', [find, catId], async (err2, result2) => {
+          await connection.query('SELECT count(*) as total FROM kajian WHERE title LIKE ? AND AND active = 1 AND categoryName = ?', [find, catId], async (err2, result2) => {
             if (!err2) {
               const find = `%${search}%`
               const totalData = result2[0].total
               const totalPage = Math.ceil(totalData / limit)
-              await connection.query('SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ? ) ) * cos( radians( ? ) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians( ? )) ) ) AS distance FROM kajian WHERE title LIKE ? AND isUstadz = 1 AND categoryName = ? HAVING distance < 1000 ORDER BY distance LIMIT ? OFFSET ?', [latitude, longitude, latitude, find, catId, limit, offset], (err3, results) => {
+              await connection.query('SELECT *, ( 6371 * acos( cos( radians(kajian.latitude) ) * cos( radians( ? ) ) * cos( radians( ? ) - radians(kajian.longitude) ) + sin( radians(kajian.latitude) ) * sin(radians( ? )) ) ) AS distance FROM kajian WHERE title LIKE ? AND categoryName = ? HAVING distance < 1000 ORDER BY distance LIMIT ? OFFSET ?', [latitude, longitude, latitude, find, catId, limit, offset], (err3, results) => {
                 if (!err3) {
                   resolve([results, totalData, page, totalPage])
                 } else {
@@ -358,11 +358,11 @@ module.exports = {
     return new Promise((resolve, reject) => {
       connection.query('UPDATE kajian SET active = ? WHERE endDateFormat <= ?', [0, dateNow], async (err1, result1) => {
         if (!err1) {
-          await connection.query('SELECT count(*) as total FROM kajian WHERE isUstadz = 1 AND categoryName = ? AND adminKajianId = ?', [categoryName, organizedId], async (err2, result2) => {
+          await connection.query('SELECT count(*) as total FROM kajian WHERE categoryName = ? AND adminKajianId = ?', [categoryName, organizedId], async (err2, result2) => {
             if (!err2) {
               const totalData = result2[0].total
               const totalPage = Math.ceil(totalData / limit)
-              await connection.query('SELECT kajian.kajian_id,kajian.adminKajianId, kajian.adminKajianName, kajian.title, kajian.image, kajian.categoryName, kajian.startDate, kajian.endDate, kajian.timeStart, kajian.timeEnd,kajian.description, kajian.linkVideo,kajian.latitude, kajian.longitude, kajian.locationMap,kajian.isUstadz, kajian.active, kajian.count_member, kajian.publishAt, kajian.payment  FROM kajian JOIN organized ON kajian.adminKajianId = organized.organized_id WHERE organized.organized_id = ? AND categoryName = ? AND isUstadz = 1 ORDER BY kajian.startDate desc LIMIT ? OFFSET ?', [organizedId, categoryName, limit, offset], (err3, results) => {
+              await connection.query('SELECT kajian.kajian_id,kajian.adminKajianId, kajian.adminKajianName, kajian.title, kajian.image, kajian.categoryName, kajian.startDate, kajian.endDate, kajian.timeStart, kajian.timeEnd,kajian.description, kajian.linkVideo,kajian.latitude, kajian.longitude, kajian.locationMap,kajian.isUstadz, kajian.active, kajian.count_member, kajian.publishAt, kajian.payment  FROM kajian JOIN organized ON kajian.adminKajianId = organized.organized_id WHERE organized.organized_id = ? AND categoryName = ?  ORDER BY kajian.startDate desc LIMIT ? OFFSET ?', [organizedId, categoryName, limit, offset], (err3, results) => {
                 if (!err3) {
                   resolve([results, totalData, page, totalPage])
                 } else {

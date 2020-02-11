@@ -93,13 +93,13 @@ module.exports = {
               service: 'gmail',
               auth: {
                 user: 'helpdesk.hijrahapp@gmail.com',
-                pass: 'hijrahapp1234'
+                pass: '@Hijrahapp1234'
               }
             })
             const mailOptions = {
               from: 'helpdesk.hijrahapp@gmail.com',
               to: OrganizedDetail[0].email,
-              subject: 'Palapaone',
+              subject: 'Activation Account',
               html:
                 'Hello, ' + OrganizedDetail[0].name_organized +
                 '<br>Selamat akun penyelenggara anda telah veritifikasi, yuk posting acara kajian anda di Aplikasi hijrah...<br>'
