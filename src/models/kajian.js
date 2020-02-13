@@ -239,7 +239,7 @@ module.exports = {
       connection.query('UPDATE kajian SET active = ? WHERE endDateFormat <= ?', [0, dateNow], async (err1, result1) => {
         if (!err1) {
           const find = `%${search}%`
-          await connection.query('SELECT count(*) as total FROM kajian WHERE title LIKE ? AND AND active = 1 AND categoryName = ?', [find, catId], async (err2, result2) => {
+          await connection.query('SELECT count(*) as total FROM kajian WHERE title LIKE ? AND categoryName = ?', [find, catId], async (err2, result2) => {
             if (!err2) {
               const find = `%${search}%`
               const totalData = result2[0].total
