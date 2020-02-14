@@ -522,6 +522,7 @@ module.exports = {
     if (req.user_id === undefined) {
       const checkKajian = await kajianModels.checkKajian(req.params.kajianId)
       const kajian = checkKajian[0]
+      console.log(kajian)
       if (kajian === undefined) {
         MiscHelper.response(res, 'Kajian not found', 204)
       } else {
@@ -616,6 +617,7 @@ module.exports = {
           detailKajian.timeStart = kajian.timeStart
           detailKajian.timeEnd = kajian.timeEnd
           detailKajian.description = kajian.description
+          detailKajian.location = kajian.location
           detailKajian.locationMap = kajian.locationMap
           detailKajian.latitude = kajian.latitude
           detailKajian.longitude = kajian.longitude
