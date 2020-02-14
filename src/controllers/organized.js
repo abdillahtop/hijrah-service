@@ -40,6 +40,7 @@ module.exports = {
       const data = {
         organized_id: uuidv4(),
         user_id: req.user_id,
+        no_ktp: req.body.noKtp,
         name_organized: req.body.nameOrganized,
         email: req.body.email,
         address: req.body.address,
