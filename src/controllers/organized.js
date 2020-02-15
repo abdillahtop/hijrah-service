@@ -199,6 +199,7 @@ module.exports = {
           }
         })
     }
+    MiscHelper.response(res, 'Not found member', 204)
   },
 
   deleteOrganized: async (req, res) => {
