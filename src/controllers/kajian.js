@@ -58,7 +58,8 @@ module.exports = {
       const data = {
         kajian_id: uuidv4(),
         adminKajianId: checkOrganized[0].organized_id,
-        adminKajianName: req.body.adminNameKajian,
+        adminKajianName: checkOrganized[0].name_organized,
+        profile_url: checkOrganized[0].profile_url,
         categoryName: checkCategory[0].name,
         location: req.body.location,
         startDate: req.body.startDate,
