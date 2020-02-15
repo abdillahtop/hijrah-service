@@ -218,7 +218,8 @@ module.exports = {
             MiscHelper.response(res, 'Bad Request', 400)
           })
       }
+    } else {
+      MiscHelper.response(res, 'Your role not allowed', 400)
     }
-    MiscHelper.response(res, 'Your role noot allowed', 400)
   }
 }
