@@ -131,7 +131,7 @@ module.exports = {
       const data = {
         kajian_id: req.params.kajianId,
         adminKajianId: checkOrganized[0].organized_id,
-        adminKajianName: checkOrganized[0].adminKajianName,
+        adminKajianName: checkOrganized[0].name_organized,
         categoryName: checkCategory[0].name,
         location: req.body.location,
         startDate: req.body.startDate,
