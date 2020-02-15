@@ -618,6 +618,7 @@ module.exports = {
           detailKajian.timeStart = kajian.timeStart
           detailKajian.timeEnd = kajian.timeEnd
           detailKajian.description = kajian.description
+          detailKajian.phoneNumber = checkOrganized[0].phone_number
           detailKajian.location = kajian.location
           detailKajian.locationMap = kajian.locationMap
           detailKajian.latitude = kajian.latitude
