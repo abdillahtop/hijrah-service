@@ -199,7 +199,7 @@ module.exports = {
           }
         })
     } else {
-      MiscHelper.response(res, 'Not found member', 204)
+      MiscHelper.response(res, 'Your role not allowed', 400)
     }
   },
 
