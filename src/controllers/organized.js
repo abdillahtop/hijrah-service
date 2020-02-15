@@ -62,7 +62,7 @@ module.exports = {
           console.log('error ' + error)
         })
     } else {
-      MiscHelper.response(res, 'Organized has been used', 401)
+      MiscHelper.response(res, 'Organized has been used', 409)
     }
   },
 
@@ -198,8 +198,9 @@ module.exports = {
             )
           }
         })
+    } else {
+      MiscHelper.response(res, 'Not found member', 204)
     }
-    MiscHelper.response(res, 'Not found member', 204)
   },
 
   deleteOrganized: async (req, res) => {
