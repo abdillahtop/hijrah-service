@@ -10,6 +10,7 @@ const uuidv4 = require('uuid/v4')
 const model = require('../helpers/model')
 const dateFormat = require('dateformat')
 const moment = require('moment')
+const config = require('../configs/global_config/config')
 
 module.exports = {
   getIndex: (req, res) => {
@@ -20,26 +21,6 @@ module.exports = {
   },
 
   addKajian: async (req, res, next) => {
-    const path = await req.file.path
-    const geturl = async (req) => {
-      cloudinary.config({
-        cloud_name: process.env.CLOUD_NAME,
-        api_key: process.env.API_CLOUD_KEY,
-        api_secret: process.env.API_CLOUD_SECRET
-      })
-
-      let dataCloudinary
-      await cloudinary.uploader.upload(path, (result) => {
-        if (result.error) {
-          MiscHelper.response(res, 'Cloud Server disable', 500)
-        } else {
-          dataCloudinary = result.url
-        }
-      })
-
-      return dataCloudinary
-    }
-
     const checkOrganized = await organizedModels.getOrganizer(
       req.user_id
     )
@@ -54,66 +35,104 @@ module.exports = {
     } else if (checkOrganized[0].activation === '0') {
       MiscHelper.response(res, 'Activation Organized first', 401)
     } else {
-      const date = dateFormat(req.body.endDate, 'yyyy-mm-dd')
-      const data = {
-        kajian_id: uuidv4(),
-        adminKajianId: checkOrganized[0].organized_id,
-        adminKajianName: checkOrganized[0].name_organized,
-        logoOrganized: checkOrganized[0].profile_url,
-        categoryName: checkCategory[0].name,
-        location: req.body.location,
-        startDate: req.body.startDate,
-        endDate: req.body.endDate,
-        endDateFormat: req.body.timeEnd == 'Selesai' ? moment(date + 'T' + '23:59').format() : moment(date + 'T' + req.body.timeEnd).format(),
-        timeStart: req.body.timeStart,
-        timeEnd: req.body.timeEnd,
-        description: req.body.description,
-        title: req.body.title,
-        linkVideo: req.body.linkVideo,
-        phoneNumber: checkOrganized[0].phone_number,
-        latitude: parseFloat(req.body.latitude),
-        longitude: parseFloat(req.body.longitude),
-        locationMap: req.body.locationMap,
-        publishAt: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
-        active: true,
-        isUstadz: false,
-        image: await geturl(),
-        count_member: 0,
-        payment: req.body.payment
+      if (req.file === undefined) {
+        const date = dateFormat(req.body.endDate, 'yyyy-mm-dd')
+        const data = {
+          kajian_id: uuidv4(),
+          adminKajianId: checkOrganized[0].organized_id,
+          adminKajianName: checkOrganized[0].name_organized,
+          logoOrganized: checkOrganized[0].profile_url,
+          categoryName: checkCategory[0].name,
+          location: req.body.location,
+          startDate: req.body.startDate,
+          endDate: req.body.endDate,
+          endDateFormat: req.body.timeEnd === 'Selesai' ? moment(date + 'T' + '23:59').format() : moment(date + 'T' + req.body.timeEnd).format(),
+          timeStart: req.body.timeStart,
+          timeEnd: req.body.timeEnd,
+          description: req.body.description,
+          title: req.body.title,
+          linkVideo: req.body.linkVideo,
+          phoneNumber: checkOrganized[0].phone_number,
+          latitude: parseFloat(req.body.latitude),
+          longitude: parseFloat(req.body.longitude),
+          locationMap: req.body.locationMap,
+          publishAt: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
+          active: true,
+          isUstadz: false,
+          image: config.defaultKajian,
+          count_member: 0,
+          payment: req.body.payment
+        }
+        kajianModels
+          .addKajian(data)
+          .then(() => {
+            MiscHelper.response(res, data.kajian_id, 200, 'Kajian has been Insert')
+          })
+          .catch(error => {
+            MiscHelper.response(res, 'Bad request', 400)
+            console.log('erronya ' + error)
+          })
+      } else {
+        const path = await req.file.path
+        const geturl = async (req) => {
+          cloudinary.config({
+            cloud_name: process.env.CLOUD_NAME,
+            api_key: process.env.API_CLOUD_KEY,
+            api_secret: process.env.API_CLOUD_SECRET
+          })
+
+          let dataCloudinary
+          await cloudinary.uploader.upload(path, (result) => {
+            if (result.error) {
+              MiscHelper.response(res, 'Cloud Server disable', 500)
+            } else {
+              dataCloudinary = result.url
+            }
+          })
+
+          return dataCloudinary
+        }
+        const date = dateFormat(req.body.endDate, 'yyyy-mm-dd')
+        const data = {
+          kajian_id: uuidv4(),
+          adminKajianId: checkOrganized[0].organized_id,
+          adminKajianName: checkOrganized[0].name_organized,
+          logoOrganized: checkOrganized[0].profile_url,
+          categoryName: checkCategory[0].name,
+          location: req.body.location,
+          startDate: req.body.startDate,
+          endDate: req.body.endDate,
+          endDateFormat: req.body.timeEnd === 'Selesai' ? moment(date + 'T' + '23:59').format() : moment(date + 'T' + req.body.timeEnd).format(),
+          timeStart: req.body.timeStart,
+          timeEnd: req.body.timeEnd,
+          description: req.body.description,
+          title: req.body.title,
+          linkVideo: req.body.linkVideo,
+          phoneNumber: checkOrganized[0].phone_number,
+          latitude: parseFloat(req.body.latitude),
+          longitude: parseFloat(req.body.longitude),
+          locationMap: req.body.locationMap,
+          publishAt: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
+          active: true,
+          isUstadz: false,
+          image: await geturl(),
+          count_member: 0,
+          payment: req.body.payment
+        }
+        kajianModels
+          .addKajian(data)
+          .then(() => {
+            MiscHelper.response(res, data.kajian_id, 200, 'Kajian has been Insert')
+          })
+          .catch(error => {
+            MiscHelper.response(res, 'Bad request', 400)
+            console.log('erronya ' + error)
+          })
       }
-      kajianModels
-        .addKajian(data)
-        .then(() => {
-          MiscHelper.response(res, data.kajian_id, 200, 'Kajian has been Insert')
-        })
-        .catch(error => {
-          MiscHelper.response(res, 'Bad request', 400)
-          console.log('erronya ' + error)
-        })
     }
   },
 
   editKajian: async (req, res, next) => {
-    const path = await req.file.path
-    const geturl = async (req) => {
-      cloudinary.config({
-        cloud_name: process.env.CLOUD_NAME,
-        api_key: process.env.API_CLOUD_KEY,
-        api_secret: process.env.API_CLOUD_SECRET
-      })
-
-      let dataCloudinary
-      await cloudinary.uploader.upload(path, (result) => {
-        if (result.error) {
-          MiscHelper.response(res, 'Cloud Server disable', 500)
-        } else {
-          dataCloudinary = result.url
-        }
-      })
-
-      return dataCloudinary
-    }
-
     const checkOrganized = await organizedModels.getOrganizer(
       req.user_id
     )
@@ -127,41 +146,98 @@ module.exports = {
     } else if (checkKajian[0].kajian_id === undefined) {
       MiscHelper.response(res, 'Kajian not found', 204)
     } else {
-      const date = dateFormat(req.body.endDate, 'yyyy-mm-dd')
-      const data = {
-        kajian_id: req.params.kajianId,
-        adminKajianId: checkOrganized[0].organized_id,
-        adminKajianName: checkOrganized[0].name_organized,
-        categoryName: checkCategory[0].name,
-        location: req.body.location,
-        startDate: req.body.startDate,
-        endDate: req.body.endDate,
-        timeStart: req.body.timeStart,
-        timeEnd: req.body.timeEnd,
-        endDateFormat: req.body.timeEnd == 'Selesai' ? moment(date + 'T' + '23:59').format() : moment(date + 'T' + req.body.timeEnd).format(),
-        description: req.body.description,
-        title: req.body.title,
-        linkVideo: req.body.linkVideo,
-        phoneNumber: checkOrganized[0].phone_number,
-        latitude: parseFloat(req.body.latitude),
-        longitude: parseFloat(req.body.longitude),
-        locationMap: req.body.locationMap,
-        publishAt: checkKajian[0].publishAt,
-        active: checkKajian[0].active,
-        isUstadz: checkKajian[0].isUstadz,
-        payment: req.body.payment,
-        image: await geturl(),
-        count_member: checkKajian[0].count_member
+      if (req.file === undefined) {
+        const date = dateFormat(req.body.endDate, 'yyyy-mm-dd')
+        const data = {
+          kajian_id: req.params.kajianId,
+          adminKajianId: checkOrganized[0].organized_id,
+          adminKajianName: checkOrganized[0].name_organized,
+          categoryName: checkCategory[0].name,
+          location: req.body.location,
+          startDate: req.body.startDate,
+          endDate: req.body.endDate,
+          timeStart: req.body.timeStart,
+          timeEnd: req.body.timeEnd,
+          endDateFormat: req.body.timeEnd === 'Selesai' ? moment(date + 'T' + '23:59').format() : moment(date + 'T' + req.body.timeEnd).format(),
+          description: req.body.description,
+          title: req.body.title,
+          linkVideo: req.body.linkVideo,
+          phoneNumber: checkOrganized[0].phone_number,
+          latitude: parseFloat(req.body.latitude),
+          longitude: parseFloat(req.body.longitude),
+          locationMap: req.body.locationMap,
+          publishAt: checkKajian[0].publishAt,
+          active: checkKajian[0].active,
+          isUstadz: checkKajian[0].isUstadz,
+          payment: req.body.payment,
+          image: checkKajian[0].image,
+          count_member: checkKajian[0].count_member
+        }
+        kajianModels
+          .updateKajian(data, req.params.kajianId)
+          .then(() => {
+            MiscHelper.response(res, 'Kajian has been update', 200)
+          })
+          .catch(error => {
+            MiscHelper.response(res, 'Bad request', 400)
+            console.log('erronya ' + error)
+          })
+      } else {
+        const path = await req.file.path
+        const geturl = async (req) => {
+          cloudinary.config({
+            cloud_name: process.env.CLOUD_NAME,
+            api_key: process.env.API_CLOUD_KEY,
+            api_secret: process.env.API_CLOUD_SECRET
+          })
+
+          let dataCloudinary
+          await cloudinary.uploader.upload(path, (result) => {
+            if (result.error) {
+              MiscHelper.response(res, 'Cloud Server disable', 500)
+            } else {
+              dataCloudinary = result.url
+            }
+          })
+
+          return dataCloudinary
+        }
+        const date = dateFormat(req.body.endDate, 'yyyy-mm-dd')
+        const data = {
+          kajian_id: req.params.kajianId,
+          adminKajianId: checkOrganized[0].organized_id,
+          adminKajianName: checkOrganized[0].name_organized,
+          categoryName: checkCategory[0].name,
+          location: req.body.location,
+          startDate: req.body.startDate,
+          endDate: req.body.endDate,
+          timeStart: req.body.timeStart,
+          timeEnd: req.body.timeEnd,
+          endDateFormat: req.body.timeEnd === 'Selesai' ? moment(date + 'T' + '23:59').format() : moment(date + 'T' + req.body.timeEnd).format(),
+          description: req.body.description,
+          title: req.body.title,
+          linkVideo: req.body.linkVideo,
+          phoneNumber: checkOrganized[0].phone_number,
+          latitude: parseFloat(req.body.latitude),
+          longitude: parseFloat(req.body.longitude),
+          locationMap: req.body.locationMap,
+          publishAt: checkKajian[0].publishAt,
+          active: checkKajian[0].active,
+          isUstadz: checkKajian[0].isUstadz,
+          payment: req.body.payment,
+          image: await geturl(),
+          count_member: checkKajian[0].count_member
+        }
+        kajianModels
+          .updateKajian(data, req.params.kajianId)
+          .then(() => {
+            MiscHelper.response(res, 'Kajian has been update', 200)
+          })
+          .catch(error => {
+            MiscHelper.response(res, 'Bad request', 400)
+            console.log('erronya ' + error)
+          })
       }
-      kajianModels
-        .updateKajian(data, req.params.kajianId)
-        .then(() => {
-          MiscHelper.response(res, 'Kajian has been update', 200)
-        })
-        .catch(error => {
-          MiscHelper.response(res, 'Bad request', 400)
-          console.log('erronya ' + error)
-        })
     }
   },
 

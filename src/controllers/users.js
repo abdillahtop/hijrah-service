@@ -112,7 +112,7 @@ module.exports = {
         name: 'ADMIN HIJRAH',
         password: passwordHash.passwordHash,
         salt: passwordHash.salt,
-        profile_url: config.defaultProfile,
+        profile_url: config.logoHIjrah,
         activation: 1,
         created_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
         updated_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
@@ -378,42 +378,59 @@ module.exports = {
   updateProfile: async (req, res) => {
     const checkUser = await userModels.userDetail(req.user_id)
 
-    const path = await req.file.path
-    const geturl = async (req) => {
-      cloudinary.config({
-        cloud_name: process.env.CLOUD_NAME,
-        api_key: process.env.API_CLOUD_KEY,
-        api_secret: process.env.API_CLOUD_SECRET
-      })
-
-      let dataCloudinary
-      await cloudinary.uploader.upload(path, (result) => {
-        if (result.error) {
-          MiscHelper.response(res, 'Cloud Server disable', 500)
-        } else {
-          dataCloudinary = result.url
-        }
-      })
-
-      return dataCloudinary
-    }
     if (checkUser[0] === undefined) {
       MiscHelper.response(res, 'User not found', 204)
     } else {
-      const data = {
-        name: req.body.name,
-        profile_url: await geturl(),
-        phone_number: req.body.phoneNumber,
-        gender: req.body.gender,
-        birth_date: req.body.birthDate
+      if (req.file === undefined) {
+        const data = {
+          name: req.body.name,
+          profile_url: checkUser[0].profile_url,
+          phone_number: req.body.phoneNumber,
+          gender: req.body.gender,
+          birth_date: req.body.birthDate
+        }
+        userModels.updateProfile(data, req.user_id)
+          .then(() => {
+            MiscHelper.response(res, 'Data has been updated', 200)
+          })
+          .catch(() => {
+            MiscHelper.response(res, 'Bad request', 400)
+          })
+      } else {
+        const path = await req.file.path
+        const geturl = async (req) => {
+          cloudinary.config({
+            cloud_name: process.env.CLOUD_NAME,
+            api_key: process.env.API_CLOUD_KEY,
+            api_secret: process.env.API_CLOUD_SECRET
+          })
+
+          let dataCloudinary
+          await cloudinary.uploader.upload(path, (result) => {
+            if (result.error) {
+              MiscHelper.response(res, 'Cloud Server disable', 500)
+            } else {
+              dataCloudinary = result.url
+            }
+          })
+
+          return dataCloudinary
+        }
+        const data = {
+          name: req.body.name,
+          profile_url: await geturl(),
+          phone_number: req.body.phoneNumber,
+          gender: req.body.gender,
+          birth_date: req.body.birthDate
+        }
+        userModels.updateProfile(data, req.user_id)
+          .then(() => {
+            MiscHelper.response(res, 'Data has been updated', 200)
+          })
+          .catch(() => {
+            MiscHelper.response(res, 'Bad request', 400)
+          })
       }
-      userModels.updateProfile(data, req.user_id)
-        .then(() => {
-          MiscHelper.response(res, 'Data has been updated', 200)
-        })
-        .catch(() => {
-          MiscHelper.response(res, 'Bad request', 400)
-        })
     }
   },
 

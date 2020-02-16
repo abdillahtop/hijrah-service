@@ -15,6 +15,7 @@ const OrganizedRoute = require('./src/routes/organized')
 const kajianRoute = require('./src/routes/kajian')
 const ustadzRoute = require('./src/routes/ustadz')
 const versionRoute = require('./src/routes/version')
+const inboxRoute = require('./src/routes/inbox')
 const whitelist = process.env.WHITELIST
 
 const corsOptions = (req, callback) => {
@@ -48,6 +49,7 @@ app.use('/api/v1/organized', OrganizedRoute)
 app.use('/api/v1/kajian', kajianRoute)
 app.use('/api/v1/ustadz', ustadzRoute)
 app.use('/api/v1/version', versionRoute)
+app.use('/api/v1/inbox', inboxRoute)
 
 process.on('uncaughtException', (err) => {
   console.error(new Date() + ' uncaughtException: ', err.message)

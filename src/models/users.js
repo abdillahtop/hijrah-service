@@ -1,11 +1,15 @@
 const connection = require('../configs/database/mysql/db.js')
 
 module.exports = {
-  getUsers: (callback) => {
-    connection.query('SELECT * FROM users', (err, result) => {
-      if (err) console.log(err)
-
-      callback(err, result)
+  getUsers: () => {
+    return new Promise((resolve, reject) => {
+      connection.query('SELECT * FROM users', (err, result) => {
+        if (!err) {
+          resolve(result)
+        } else {
+          reject(new Error(err))
+        }
+      })
     })
   },
 

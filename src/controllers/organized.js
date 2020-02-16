@@ -1,4 +1,5 @@
 const userModels = require('../models/users')
+const inboxModels = require('../models/inbox')
 const organizedModels = require('../models/organized')
 const MiscHelper = require('../helpers/helpers')
 const uuidv4 = require('uuid/v4')
@@ -6,6 +7,7 @@ const cloudinary = require('cloudinary')
 const dateFormat = require('dateformat')
 const nodemailer = require('nodemailer')
 const validate = require('validate.js')
+const config = require('../configs/global_config/config')
 
 module.exports = {
   getIndex: (req, res) => {
@@ -18,49 +20,76 @@ module.exports = {
   register: async (req, res) => {
     const checkOrganized = await organizedModels.getOrganizerbyEmail(req.body.email)
     if (checkOrganized[0] === undefined) {
-      const path = await req.file.path
-      const geturl = async (req) => {
-        cloudinary.config({
-          cloud_name: process.env.CLOUD_NAME,
-          api_key: process.env.API_CLOUD_KEY,
-          api_secret: process.env.API_CLOUD_SECRET
-        })
+      if (req.file === undefined) {
+        const data = {
+          organized_id: uuidv4(),
+          user_id: req.user_id,
+          no_ktp: req.body.noKtp,
+          name_organized: req.body.nameOrganized,
+          email: req.body.email,
+          address: req.body.address,
+          profile_url: config.defaultProfile,
+          phone_number: req.body.phoneNumber,
+          description: req.body.description,
+          management: req.body.nameManagement,
+          created_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
+          updated_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
+          activation: 0
+        }
+        organizedModels
+          .registerOrganizer(data)
+          .then(() => {
+            MiscHelper.response(res, 'Register organized success', 200)
+          })
+          .catch(error => {
+            MiscHelper.response(res, 'Bad Request', 400)
+            console.log('error ' + error)
+          })
+      } else {
+        const path = await req.file.path
+        const geturl = async (req) => {
+          cloudinary.config({
+            cloud_name: process.env.CLOUD_NAME,
+            api_key: process.env.API_CLOUD_KEY,
+            api_secret: process.env.API_CLOUD_SECRET
+          })
 
-        let dataCloudinary
-        await cloudinary.uploader.upload(path, (result) => {
-          if (result.error) {
-            MiscHelper.response(res, 'Cloud Server disable', 500)
-          } else {
-            dataCloudinary = result.url
-          }
-        })
-        return dataCloudinary
-      }
+          let dataCloudinary
+          await cloudinary.uploader.upload(path, (result) => {
+            if (result.error) {
+              MiscHelper.response(res, 'Cloud Server disable', 500)
+            } else {
+              dataCloudinary = result.url
+            }
+          })
+          return dataCloudinary
+        }
 
-      const data = {
-        organized_id: uuidv4(),
-        user_id: req.user_id,
-        no_ktp: req.body.noKtp,
-        name_organized: req.body.nameOrganized,
-        email: req.body.email,
-        address: req.body.address,
-        profile_url: await geturl(),
-        phone_number: req.body.phoneNumber,
-        description: req.body.description,
-        management: req.body.nameManagement,
-        created_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
-        updated_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
-        activation: 0
+        const data = {
+          organized_id: uuidv4(),
+          user_id: req.user_id,
+          no_ktp: req.body.noKtp,
+          name_organized: req.body.nameOrganized,
+          email: req.body.email,
+          address: req.body.address,
+          profile_url: await geturl(),
+          phone_number: req.body.phoneNumber,
+          description: req.body.description,
+          management: req.body.nameManagement,
+          created_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
+          updated_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
+          activation: 0
+        }
+        organizedModels
+          .registerOrganizer(data)
+          .then(() => {
+            MiscHelper.response(res, 'Register organized success', 200)
+          })
+          .catch(error => {
+            MiscHelper.response(res, 'Bad Request', 400)
+            console.log('error ' + error)
+          })
       }
-      organizedModels
-        .registerOrganizer(data)
-        .then(() => {
-          MiscHelper.response(res, 'Register organized success', 200)
-        })
-        .catch(error => {
-          MiscHelper.response(res, 'Bad Request', 400)
-          console.log('error ' + error)
-        })
     } else {
       MiscHelper.response(res, 'Organized has been used', 409)
     }
@@ -112,6 +141,16 @@ module.exports = {
                 console.log('Sukses Send email')
               }
             })
+            const data = {
+              inbox_id: uuidv4(),
+              user_id: OrganizedDetail[0].user_id,
+              created_at: new Date(),
+              isRead: 0,
+              content: 'Ayo buat acara dakwah',
+              title: 'Alhamudlillah, akun anda terverifikasi jadi penyelenggara',
+              logo: config.logoHIjrah
+            }
+            inboxModels.addInbox(data)
             MiscHelper.response(res, 'Organized actived', 200)
           })
           .catch(() => {
@@ -132,50 +171,77 @@ module.exports = {
     } else if (organizedDetail[0] === undefined) {
       MiscHelper.response(res, 'User not found', 204)
     } else {
-      const path = await req.file.path
-      const geturl = async (req) => {
-        cloudinary.config({
-          cloud_name: process.env.CLOUD_NAME,
-          api_key: process.env.API_CLOUD_KEY,
-          api_secret: process.env.API_CLOUD_SECRET
-        })
+      if (req.file === undefined) {
+        const data = {
+          organized_id: organizedDetail[0].organized_id,
+          user_id: req.user_id,
+          name_organized: validate.isEmpty(req.body.nameOrganized) ? organizedDetail[0].name_organized : req.body.nameOrganized,
+          email: validate.isEmpty(req.body.email) ? organizedDetail[0].email : req.body.email,
+          salt: checkUser[0].salt,
+          password: checkUser[0].password,
+          address: validate.isEmpty(req.body.address) ? organizedDetail[0].address : req.body.address,
+          profile_url: organizedDetail[0].profile_url,
+          phone_number: validate.isEmpty(req.body.phoneNumber) ? organizedDetail[0].phone_number : req.body.phoneNumber,
+          description: validate.isEmpty(req.body.description) ? organizedDetail[0].description : req.body.description,
+          management: validate.isEmpty(req.body.nameManagement) ? organizedDetail[0].management : req.body.nameManagement,
+          created_at: organizedDetail[0].created_at,
+          updated_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
+          activation: organizedDetail[0].activation
+        }
+        organizedModels.updateOrganized(data, req.user_id)
+          .then(() => {
+            MiscHelper.response(res, 'Data has been updated', 200)
+          })
+          .catch((err) => {
+            console.log(err)
+            MiscHelper.response(res, 'Bad request', 400)
+          })
+      } else {
+        const path = await req.file.path
+        const geturl = async (req) => {
+          cloudinary.config({
+            cloud_name: process.env.CLOUD_NAME,
+            api_key: process.env.API_CLOUD_KEY,
+            api_secret: process.env.API_CLOUD_SECRET
+          })
 
-        let dataCloudinary
-        await cloudinary.uploader.upload(path, (result) => {
-          if (result.error) {
-            MiscHelper.response(res, 'Cloud Server disable', 500)
-          } else {
-            dataCloudinary = result.url
-          }
-        })
+          let dataCloudinary
+          await cloudinary.uploader.upload(path, (result) => {
+            if (result.error) {
+              MiscHelper.response(res, 'Cloud Server disable', 500)
+            } else {
+              dataCloudinary = result.url
+            }
+          })
 
-        return dataCloudinary
+          return dataCloudinary
+        }
+
+        const data = {
+          organized_id: organizedDetail[0].organized_id,
+          user_id: req.user_id,
+          name_organized: validate.isEmpty(req.body.nameOrganized) ? organizedDetail[0].name_organized : req.body.nameOrganized,
+          email: validate.isEmpty(req.body.email) ? organizedDetail[0].email : req.body.email,
+          salt: checkUser[0].salt,
+          password: checkUser[0].password,
+          address: validate.isEmpty(req.body.address) ? organizedDetail[0].address : req.body.address,
+          profile_url: await geturl(),
+          phone_number: validate.isEmpty(req.body.phoneNumber) ? organizedDetail[0].phone_number : req.body.phoneNumber,
+          description: validate.isEmpty(req.body.description) ? organizedDetail[0].description : req.body.description,
+          management: validate.isEmpty(req.body.nameManagement) ? organizedDetail[0].management : req.body.nameManagement,
+          created_at: organizedDetail[0].created_at,
+          updated_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
+          activation: organizedDetail[0].activation
+        }
+        organizedModels.updateOrganized(data, req.user_id)
+          .then(() => {
+            MiscHelper.response(res, 'Data has been updated', 200)
+          })
+          .catch((err) => {
+            console.log(err)
+            MiscHelper.response(res, 'Bad request', 400)
+          })
       }
-
-      const data = {
-        organized_id: organizedDetail[0].organized_id,
-        user_id: req.user_id,
-        name_organized: validate.isEmpty(req.body.nameOrganized) ? organizedDetail[0].name_organized : req.body.nameOrganized,
-        email: validate.isEmpty(req.body.email) ? organizedDetail[0].email : req.body.email,
-        salt: checkUser[0].salt,
-        password: checkUser[0].password,
-        address: validate.isEmpty(req.body.address) ? organizedDetail[0].address : req.body.address,
-        profile_url: await geturl(),
-        phone_number: validate.isEmpty(req.body.phoneNumber) ? organizedDetail[0].phone_number : req.body.phoneNumber,
-        description: validate.isEmpty(req.body.description) ? organizedDetail[0].description : req.body.description,
-        management: validate.isEmpty(req.body.nameManagement) ? organizedDetail[0].management : req.body.nameManagement,
-        created_at: organizedDetail[0].created_at,
-        updated_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
-        activation: organizedDetail[0].activation
-      }
-      organizedModels.updateOrganized(data, req.user_id)
-        .then(() => {
-          MiscHelper.response(res, 'Data has been updated', 200)
-        })
-        .catch((err) => {
-          console.log(err)
-          MiscHelper.response(res, 'Bad request', 400)
-        })
     }
   },
 
