@@ -146,7 +146,7 @@ module.exports = {
               user_id: OrganizedDetail[0].user_id,
               created_at: new Date(),
               isRead: 0,
-              content: 'Ayo buat acara dakwah',
+              content: 'Ayo buat acara dakwah untuk disebarkan ke muda-mudi Hijrah, bismillahirrahmanirrahim',
               title: 'Alhamudlillah, akun anda terverifikasi jadi penyelenggara',
               logo: config.logoHIjrah
             }
