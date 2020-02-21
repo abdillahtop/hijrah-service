@@ -4,7 +4,7 @@ const MiscHelper = require('../helpers/helpers')
 const cloudinary = require('cloudinary')
 const uuidv4 = require('uuid/v4')
 // const dates = require('dateformat')
-// const dateFormat = require('dateformat')
+const dateFormat = require('dateformat')
 // const moment = require('moment')
 const config = require('../configs/global_config/config')
 
@@ -56,12 +56,11 @@ module.exports = {
 
       if (req.file === undefined) {
         allUser.map(async (data, v) => {
-          console.log(data)
           if (data.role_id === 1) {
             const payload = {
               inbox_id: uuidv4(),
               user_id: data.user_id,
-              created_at: new Date(),
+              created_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
               content: req.body.content,
               isRead: 0,
               title: req.body.title,
@@ -103,7 +102,7 @@ module.exports = {
             const payload = {
               inbox_id: uuidv4(),
               user_id: data.user_id,
-              created_at: new Date(),
+              created_at: dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
               content: req.body.content,
               isRead: 0,
               title: req.body.title,

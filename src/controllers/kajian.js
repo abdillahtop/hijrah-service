@@ -14,6 +14,7 @@ const config = require('../configs/global_config/config')
 
 module.exports = {
   getIndex: (req, res) => {
+    console.log(new Date())
     return res.json({
       code: 200,
       message: 'Server Running well, ready to use'

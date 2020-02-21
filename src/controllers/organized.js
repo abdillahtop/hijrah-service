@@ -122,12 +122,12 @@ module.exports = {
             const transporter = nodemailer.createTransport({
               service: 'gmail',
               auth: {
-                user: config.email,
-                pass: config.passwordEmail
+                user: 'helpdesk.apphijrah@gmail.com',
+                pass: '@Apphijrah2020'
               }
             })
             const mailOptions = {
-              from: config.email,
+              from: 'helpdesk.apphijrah@gmail.com',
               to: OrganizedDetail[0].email,
               subject: 'Activation Account',
               html:
