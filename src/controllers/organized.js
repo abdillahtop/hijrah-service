@@ -8,6 +8,8 @@ const dateFormat = require('dateformat')
 const nodemailer = require('nodemailer')
 const validate = require('validate.js')
 const config = require('../configs/global_config/config')
+const handlebars = require('handlebars')
+const fs = require('fs')
 
 module.exports = {
   getIndex: (req, res) => {
@@ -119,6 +121,17 @@ module.exports = {
       } else {
         organizedModels.activationOrganized(req.query.organizedId)
           .then(() => {
+            const readHTMLFile = function (path, callback) {
+              fs.readFile(path, { encoding: 'utf-8' }, function (err, html) {
+                if (err) {
+                  throw err
+                  callback(err)
+                } else {
+                  callback(null, html)
+                }
+              })
+            }
+
             const transporter = nodemailer.createTransport({
               service: 'gmail',
               auth: {
@@ -126,21 +139,28 @@ module.exports = {
                 pass: config.passwordEmail
               }
             })
-            const mailOptions = {
-              from: config.email,
-              to: OrganizedDetail[0].email,
-              subject: 'Activation Account',
-              html:
-                'Hello, ' + OrganizedDetail[0].name_organized +
-                '<br>Selamat akun penyelenggara anda telah veritifikasi, yuk posting acara kajian anda di Aplikasi hijrah...<br>'
-            }
-            transporter.sendMail(mailOptions, function (err, info) {
-              if (err) {
-                console.log('Error send email ' + err)
-              } else {
-                console.log('Sukses Send email')
+
+            readHTMLFile(__dirname + '/../helpers/mail/index.html', function (err, html) {
+              const template = handlebars.compile(html)
+              const replacements = {
+                username: OrganizedDetail[0].name_organized
               }
+              const htmlToSend = template(replacements)
+              const mailOptions = {
+                from: config.email,
+                to: OrganizedDetail[0].email,
+                subject: 'Activation Account',
+                html: htmlToSend
+              }
+              transporter.sendMail(mailOptions, function (error, response) {
+                if (error) {
+                  console.log('Error send email ' + err)
+                } else {
+                  console.log('Sukses Send email')
+                }
+              })
             })
+
             const data = {
               inbox_id: uuidv4(),
               user_id: OrganizedDetail[0].user_id,
