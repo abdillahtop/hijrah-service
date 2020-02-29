@@ -22,7 +22,7 @@ module.exports = {
             if (!err2) {
               const totalData = result2[0].total
               const totalPage = Math.ceil(totalData / limit)
-              await connection.query('SELECT * FROM kajian WHERE active = 1 ORDER BY startDate desc LIMIT ? OFFSET ?', [limit, offset], (err3, results) => {
+              await connection.query('SELECT * FROM kajian WHERE active = 1 ORDER BY startDate asc LIMIT ? OFFSET ?', [limit, offset], (err3, results) => {
                 if (!err3) {
                   resolve([results, totalData, page, totalPage])
                 } else {
