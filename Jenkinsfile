@@ -14,8 +14,9 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                echo 'Deploying....'
+                sh "npm install"
+                sh "node app.js"
             }
-        }
+        } 
     }
 }
