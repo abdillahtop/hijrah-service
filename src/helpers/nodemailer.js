@@ -6,14 +6,14 @@ module.exports = (req, res) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'roronoazum@gmail.com',
-      pass: 'sewelas11'
+      user: 'rahasia@gmail.com',
+      pass: 'rahasia'
     }
   })
   console.log(req.body)
   const body = 'api/v1/user/activation?email=' + req.body.email
   const mailOptions = {
-    from: 'roronoazum@gmail.com',
+    from: 'rahasia@gmail.com',
     to: req.body.email,
     subject: 'Verify Akun',
     html: 'Hello, ' + req.body.name + '<br> Please Click on the link to verify your email.<br><a href=' + domain.baseUrl / body + '>Click here to verify</a>'
